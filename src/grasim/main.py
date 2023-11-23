@@ -4,7 +4,6 @@ from dataclasses import dataclass
 
 import glob
 import re
-from typing import TypeVar
 
 @dataclass
 class Game:
@@ -20,7 +19,7 @@ def read_file(filename: str):
 
 
 # list of (node1, distance, node2)
-NodeDistances = list[tuple[str, int, str]]
+NodeDistance = tuple[str, int, str]
 
 def start_game(unparsed_save: str, game : Game):
 
@@ -29,7 +28,7 @@ def start_game(unparsed_save: str, game : Game):
     # TODO function: parse_graph
     nodes : set = set()
     heuristics_dict = {}
-    distances : NodeDistances = []
+    distances : list[NodeDistance] = []
     start : str | None
     end : str | None 
 

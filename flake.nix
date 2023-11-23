@@ -14,10 +14,8 @@
           packages = with pkgs; [ python311 virtualenv ] ++
             (with pkgs.python311Packages; [ 
               pip
-              python-constraint
               pygame
-              scipy
-	      numpy
+              numpy
              ]);
 	  shellHook = ''
 	    $SHELL
