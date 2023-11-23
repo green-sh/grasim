@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import igraph as ig
 from dataclasses import dataclass
 
 import glob
@@ -70,9 +71,13 @@ def start_game(unparsed_save: str, game : Game):
 
     # end function parse graph
 
+    adjancy_matrix = graph_matrix.copy()
+    adjancy_matrix[adjancy_matrix == -1] = 0
+    adjancy_matrix[adjancy_matrix != 0] = 1
 
-    points = np.random.random((graph_matrix.shape[0], 2))
-    points = (points * game.screen.get_size())
+    points = np.array(ig.Graph.Adjacency(adjancy_matrix, mode="min").layout().coords)
+    points = points - points.min()
+    points = ((points / points.max() + 0.1) * game.size * 0.8)
 
     for point, name in zip(points, node_lookup.keys()):
         pygame.draw.circle(game.screen, "purple", point, 5)

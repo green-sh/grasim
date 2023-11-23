@@ -16,6 +16,9 @@
               pip
               pygame
               numpy
+	      igraph
+	      matplotlib
+              pycairo
              ]);
 	  shellHook = ''
 	    $SHELL
