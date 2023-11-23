@@ -6,20 +6,21 @@ from scipy import spatial
 def distance(n, m):
     return np.linalg.norm(n - m)
 
-# generate points
-num_points = 10000
-points = np.random.random((num_points, 2))
 
 # pygame setup
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
+
+# generate points
+num_points = 10000
+points = np.random.random((num_points, 2))
+points = (points * screen.get_size())
 
 nth_closest = 3
 graph_table = np.full([len(points), len(points)], fill_value=np.False_, dtype=np.bool_)
 
 screen.fill("black")
 # Distribute points along the screen
-points = (points * screen.get_size())
 kdtree = spatial.KDTree(points)
 for idx in range(len(points)):
     # lookup closest in tree
@@ -40,7 +41,7 @@ pygame.draw.circle(screen, "red", points[start_idx], 5)
 end_idx = len(points)-1
 pygame.draw.circle(screen, "blue", points[end_idx], 5)
 
-# Store distances from start to each point and the travel point
+# Store distances from start to each point, the travel point, wether or not it's done
 djakstrar_table = np.ones((len(points), 3)) * [np.inf, 0, 0]
 
 # Start with 0

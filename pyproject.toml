@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "grasim"
+version = "0.1.0"
+description = "Simulation for A* or Dijkstra"
+authors = ["greenishhhh <playgreenxst@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26.2"
+pygame = "^2.5.2"
+
+[tool.poetry.scripts]
+grasim = 'grasim.main:start'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
