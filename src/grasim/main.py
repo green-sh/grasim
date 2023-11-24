@@ -20,7 +20,9 @@ def read_file(filename: str):
 
 def start_game(unparsed_save: str, game : Game):
 
-    game.screen.fill("black")
+    offsetX = 0
+    offsetY = 0
+    zoom = 1
 
     font_screen = game.font.render("<ENTER> step; <BACK> choose save", True, "white", "black")
     game.screen.blit(font_screen, np.array(game.size)-font_screen.get_size())
@@ -36,27 +38,51 @@ def start_game(unparsed_save: str, game : Game):
     points = points + abs(points.min(0))
     points = ((points / abs(points).max(0) + 0.02) * game.size * 0.9)
 
-    for point, name in zip(points, graph.node_lookup.keys()):
-        pygame.draw.circle(game.screen, "purple", point, 5)
-        font_screen = game.font.render(f"{name}{(graph.heuristics[graph.node_lookup[name]])}", True, "white", "black")
-        game.screen.blit(font_screen, point+5)
-
-    for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
-        pygame.draw.line(game.screen,"white", points[idx1], points[idx2])
-        font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
-        game.screen.blit(font_screen, (points[idx1] + points[idx2])/2-5)
-
-    pygame.display.flip()
-
     djakstrar_table = np.ones((graph.graph_matrix.shape[0], 4)) * [np.inf, 0, 0, np.inf] # distance, last_idx, done, estimated_total
     djakstrar_table[graph.start_idx] = [0, graph.start_idx, 0, 0]
 
     running = True
     can_continue = False
+    should_draw = True
     while running:
+
+        if should_draw:
+            should_draw = False
+            # drawing everything
+            game.screen.fill("black")
+            draw_points = points * zoom + [offsetX, offsetY]
+            for point, name in zip(draw_points, graph.node_lookup.keys()):
+                # If node is not done draw purple, otherwise green
+                if djakstrar_table[graph.node_lookup[name], 0] == np.inf:
+                    pygame.draw.circle(game.screen, "purple", point, 5)
+                elif djakstrar_table[graph.node_lookup[name], 2] != 1:
+                    pygame.draw.circle(game.screen, "green", point, 5)
+                else:
+                    pygame.draw.circle(game.screen, "orange", point, 5)
+                font_screen = game.font.render(f"{name}{(graph.heuristics[graph.node_lookup[name]])}", True, "white", "black")
+                game.screen.blit(font_screen, point+5)
+
+            for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
+                # if path is explored draw green otherwise white
+                if (int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0:
+                    pygame.draw.line(game.screen,"green", draw_points[idx1], draw_points[idx2], 5)
+                else:
+                    pygame.draw.line(game.screen,"white", draw_points[idx1], draw_points[idx2])
+                font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
+                game.screen.blit(font_screen, (draw_points[idx1] + draw_points[idx2])/2-5)
+
+            if djakstrar_table[graph.end_idx, 2] == 1:
+                traverse_idx = graph.end_idx
+                while traverse_idx != graph.start_idx:
+                    traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
+                    pygame.draw.line(game.screen,"orange", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
+                    traverse_idx = traverse_idx2
+            # End drawing
+        
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
+            should_draw = True
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
@@ -64,6 +90,30 @@ def start_game(unparsed_save: str, game : Game):
                     running = False
                 if event.key == pygame.K_RETURN:
                     can_continue = True
+            
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            offsetY += 20*abs(zoom)
+            should_draw = True
+        elif keys[pygame.K_DOWN]:
+            offsetY -= 20*abs(zoom)
+            should_draw = True
+        if keys[pygame.K_LEFT]:
+            offsetX += 20*abs(zoom)
+            should_draw = True
+        elif keys[pygame.K_RIGHT]:
+            offsetX -= 20*abs(zoom)
+            should_draw = True
+        if keys[pygame.K_PLUS]:
+            zoom += 0.1
+            offsetX -= game.size[0]*0.1/2
+            offsetY -= game.size[1]*0.1/2
+            should_draw = True
+        elif keys[pygame.K_MINUS]:
+            zoom -= 0.1 
+            offsetX += game.size[0]*0.1/2
+            offsetY += game.size[1]*0.1/2
+            should_draw = True
 
         # expand
         valid_idx = np.where((djakstrar_table[:, 2] == 0) & (djakstrar_table[:, 3] != np.inf))[0]
@@ -74,8 +124,6 @@ def start_game(unparsed_save: str, game : Game):
             next_idx = valid_idx[djakstrar_table[valid_idx, 3].argmin()]
 
             djakstrar_table[next_idx][2] = 1
-            pygame.draw.circle(game.screen, "green", points[next_idx], 5)
-            pygame.draw.line(game.screen, "green", points[next_idx], points[int(djakstrar_table[next_idx, 1])], 5)
 
             for idx_expand in np.where(graph.graph_matrix[next_idx] != -1)[0]:
                 distance = graph.graph_matrix[next_idx, idx_expand] + djakstrar_table[next_idx, 0]
@@ -85,14 +133,7 @@ def start_game(unparsed_save: str, game : Game):
                 if djakstrar_table[idx_expand][2] == 0 \
                     and djakstrar_table[idx_expand][0] > estimated_total:
                     djakstrar_table[idx_expand] = [distance, next_idx, 0, estimated_total]
-                    pygame.draw.circle(game.screen, "yellow", points[idx_expand], 5)
         
-                if djakstrar_table[graph.end_idx, 2] == 1:
-                    traverse_idx = graph.end_idx
-                    while traverse_idx != graph.start_idx:
-                        traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
-                        pygame.draw.line(game.screen, "orange", points[traverse_idx], points[traverse_idx2], 5)
-                        traverse_idx = traverse_idx2
 
         pygame.display.flip()
 
