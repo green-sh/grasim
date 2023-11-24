@@ -1,0 +1,20 @@
+A -1- B
+A -1- C
+A -1- L
+B -1- A
+B -1- D
+B -1- G
+C -1- A
+C -1- F
+C -1- K
+D -1- B
+D -1- E
+D -1- G
+E -1- D
+E -1- I
+E -1- L
+F -1- C
+F -1- J
+F -1- K
+START A
+END G

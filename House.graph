@@ -1,0 +1,8 @@
+A -1- B
+A -1- C
+B -1- A
+B -1- D
+C -1- A
+C -1- D
+START A
+END C

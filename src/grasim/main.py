@@ -10,7 +10,6 @@ import glob
 class Game:
     pygame.init()
     screen = pygame.display.set_mode((1280, 720))
-    size = screen.get_size()
     clock = pygame.time.Clock()
     font = pygame.font.Font(pygame.font.get_default_font())
 
@@ -24,8 +23,6 @@ def start_game(unparsed_save: str, game : Game):
     offsetY = 0
     zoom = 1
 
-    font_screen = game.font.render("<ENTER> step; <BACK> choose save", True, "white", "black")
-    game.screen.blit(font_screen, np.array(game.size)-font_screen.get_size())
 
     graph = savefile.parse_text(unparsed_save)
 
@@ -36,7 +33,7 @@ def start_game(unparsed_save: str, game : Game):
     # Use igraph to make the graph pretty: position nodes better
     points = np.array(ig.Graph.Adjacency(adjancy_matrix, mode="min").layout().coords)
     points = points + abs(points.min(0))
-    points = ((points / abs(points).max(0) + 0.02) * game.size * 0.9)
+    points = ((points / abs(points).max(0) + 0.02) * game.screen.get_size() * 0.9)
 
     djakstrar_table = np.ones((graph.graph_matrix.shape[0], 4)) * [np.inf, 0, 0, np.inf] # distance, last_idx, done, estimated_total
     djakstrar_table[graph.start_idx] = [0, graph.start_idx, 0, 0]
@@ -64,7 +61,7 @@ def start_game(unparsed_save: str, game : Game):
 
             for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
                 # if path is explored draw green otherwise white
-                if (int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0:
+                if ((int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0) or ((int(djakstrar_table[idx2, 1]) == idx1) and djakstrar_table[idx2, 2] == 1.0):
                     pygame.draw.line(game.screen,"green", draw_points[idx1], draw_points[idx2], 5)
                 else:
                     pygame.draw.line(game.screen,"white", draw_points[idx1], draw_points[idx2])
@@ -77,6 +74,10 @@ def start_game(unparsed_save: str, game : Game):
                     traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
                     pygame.draw.line(game.screen,"orange", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
                     traverse_idx = traverse_idx2
+
+            
+            font_screen = game.font.render("inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
+            game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
             # End drawing
         
         # poll for events
@@ -106,13 +107,13 @@ def start_game(unparsed_save: str, game : Game):
             should_draw = True
         if keys[pygame.K_PLUS]:
             zoom += 0.1
-            offsetX -= game.size[0]*0.1/2
-            offsetY -= game.size[1]*0.1/2
+            offsetX -= game.screen.get_size()[0]*0.1/2
+            offsetY -= game.screen.get_size()[1]*0.1/2
             should_draw = True
         elif keys[pygame.K_MINUS]:
             zoom -= 0.1 
-            offsetX += game.size[0]*0.1/2
-            offsetY += game.size[1]*0.1/2
+            offsetX += game.screen.get_size()[0]*0.1/2
+            offsetY += game.screen.get_size()[1]*0.1/2
             should_draw = True
 
         # expand
@@ -159,9 +160,13 @@ def select_level_screen(game: Game):
                     savefile = read_file(saves[selected_save])
                     start_game(savefile, game)
 
-        for i, savename in enumerate(saves):
+                selected_save = selected_save % len(saves)
+
+        game.screen.fill("black")        
+
+        for i, savename in enumerate(saves[selected_save:] + saves[:selected_save]):
             color = "black"
-            if i == selected_save:
+            if savename == saves[selected_save]:
                 color = "red"
             save_screen = game.font.render(savename, 1, "white", color)
             game.screen.blit(save_screen, (0, 20*i))
@@ -188,10 +193,10 @@ def start():
         # Show Hello Box
         button_size = [300, 100]
         pygame.draw.rect(game.screen, "white", 
-            (game.size[0]/2-button_size[0]/2, game.size[1]/2-button_size[1]/2, button_size[0], button_size[1]), 2)
+            (game.screen.get_size()[0]/2-button_size[0]/2, game.screen.get_size()[1]/2-button_size[1]/2, button_size[0], button_size[1]), 2)
         
         text_surface = game.font.render("Press enter to start", True, "white", "black")
-        game.screen.blit(text_surface, (game.size[0]/2 - text_surface.get_size()[0]/2, game.size[1]/2 - text_surface.get_size()[1]/2))
+        game.screen.blit(text_surface, (game.screen.get_size()[0]/2 - text_surface.get_size()[0]/2, game.screen.get_size()[1]/2 - text_surface.get_size()[1]/2))
 
         pygame.display.flip()
 
