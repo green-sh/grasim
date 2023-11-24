@@ -1,0 +1,89 @@
+#S1
+wedel -4- rissen
+rissen -4- sulldorf
+sulldorf -2- iserbrock
+iserbrock -2- blankenese
+blankenese -2- hochkamp
+hochkamp -3- klein_flottbeck
+klein_flottbeck -2- othmarschen
+othmarschen -2- bahrenfeld
+bahrenfeld -2- ottensen
+ottensen -2- altona
+altona -1- königsstraße
+königsstraße -1- reeperbahn
+reeperbahn -1- landungsbrücken
+landungsbrücken -1- stadthausbrücke
+stadthausbrücke -1- jungfernstieg
+jungfernstieg -1- hauptbahnhof
+hauptbahnhof -1- berliner_tor
+berliner_tor -1- landwehr
+landwehr -1- hasselbrook
+hasselbrook -1- wandsbecker_chaussee
+wandsbecker_chaussee -1- friedrichsberg
+friedrichsberg -1- barmbek
+barmbek -1- alte_wohr
+alte_wohr -1- rubenkamp
+rubenkamp -1- ohlsdorf
+ohlsdorf -1- airport
+ohlsdorf -1- kornweg
+kornweg -1- hohenreich
+hohenreich -1- welingsbüttel
+welingsbüttel -1- poppenbüttel
+
+#S3
+pinneberg -1- thesdorf
+thesdorf -1- halstenbek
+halstenbek -1- krupunder
+krupunder -1- elbgaustraße
+elbgaustraße -1- eidelstedt
+eidelstedt -1- stellingen
+stellingen -1- langenfelde
+langenfelde -1- diebsteich
+diebsteich -1- altona
+altona -1- holstenstraße
+holstenstraße -1- sternschanze
+sternschanze -1- dammtor
+dammtor -1- königstraße
+königstraße -1- reeperbahn
+reeperbahn -1- landungsbrücken
+landungsbrücken -1- stadthausbrücke
+stadthausbrücke -1- jungfernstieg
+jungfernstieg -1- hauptbahnhof
+hauptbahnhof -1- hammerbrook
+hammerbrook -1- elbbrücken
+elbbrücken -1- veddel
+veddel -1- wilhelmsburg
+wilhelmsburg -1- harburg
+harburg -1- heimfeld
+heimfeld -1- neuwiedenthal
+neuwiedenthal -1- neugraben
+neugraben -1- fischbek
+fischbek -1- buxtehude
+buxtehude -1- neukloster
+neukloster -1- horneburg
+horneburg -1- dollern
+dollern -1- agathenburg
+agathenburg -1- stade
+
+# S2
+altona -1- königstraße
+königstraße -1- reeperbahn
+reeperbahn -1- landungsbrücken
+landungsbrücken -1- stadthausbrücke
+stadthausbrücke -1- jungfernstieg
+jungfernstieg -1- hauptbahnhof
+hauptbahnhof -1- berliner_tor
+berliner_tor -1- rothenburgsort
+rothenburgsort -1- tiefstack
+tiefstack -1- billwerder_moorfleet
+billwerder_moorfleet -1- mittlerer
+
+mittlerer -1- allermöhe
+allermöhe -1- nettelnburg
+nettelnburg -1- bergedorf
+
+
+
+
+START wedel
+END stade

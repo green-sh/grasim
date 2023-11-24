@@ -2,9 +2,9 @@ import pygame
 import numpy as np
 import igraph as ig
 from dataclasses import dataclass
+from grasim import savefile
 
 import glob
-import re
 
 @dataclass
 class Game:
@@ -18,79 +18,38 @@ def read_file(filename: str):
     with open(filename, "r") as f:
         return f.readlines()
 
-
-# list of (node1, distance, node2)
-NodeDistance = tuple[str, int, str]
-
 def start_game(unparsed_save: str, game : Game):
 
     game.screen.fill("black")
-    
-    # TODO function: parse_graph
-    nodes : set = set()
-    heuristics_dict = {}
-    distances : list[NodeDistance] = []
-    start : str | None
-    end : str | None 
 
-    node_node_connection_regex = re.compile(r"(\w+) -(\d+)- (\w+)")
-    node_heuristic_regex = re.compile(r"(\w+)\((\d+)\)")
-    node_start_regex = re.compile(r"START (\w+)")
-    node_end_regex = re.compile(r"END (\w+)")
+    font_screen = game.font.render("<ENTER> step; <BACK> choose save", True, "white", "black")
+    game.screen.blit(font_screen, np.array(game.size)-font_screen.get_size())
 
-    for line_idx, line in enumerate(unparsed_save):        
-        if match := node_node_connection_regex.match(line):
-            node1, estimated_total, node2 = match.groups()
-            nodes.add(node1)
-            nodes.add(node2)
-            distances.append((node1, float(estimated_total), node2))
-        elif match := node_heuristic_regex.match(line):
-            node, heuristic = match.groups()
-            heuristics_dict[node] = float(heuristic)
-        elif match := node_start_regex.match(line):
-            start = str(match.group(1))
-        elif match := node_end_regex.match(line):
-            end = str(match.group(1))
+    graph = savefile.parse_text(unparsed_save)
 
-    # Create Graph matrix
-    graph_matrix = np.full((len(nodes), len(nodes)), -1, dtype=np.int16)
-    
-    # Lookuptable for variables 'A' -> 0, 'B' -> 1
-    node_lookup = dict(zip(list(nodes), range(len(nodes)))) 
-    # Write distance into graph
-    for node1, estimated_total, node2 in distances:
-        idx1 = node_lookup[node1]
-        idx2 = node_lookup[node2]
-        graph_matrix[idx1, idx2] = estimated_total
-        graph_matrix[idx2, idx1] = estimated_total
-
-    start_idx = node_lookup[start]
-    end_idx = node_lookup[end]
-
-    heuristics = [heuristics_dict[x] for x in node_lookup.keys()]
-
-    # end function parse graph
-
-    adjancy_matrix = graph_matrix.copy()
+    adjancy_matrix = graph.graph_matrix.copy()
     adjancy_matrix[adjancy_matrix == -1] = 0
     adjancy_matrix[adjancy_matrix != 0] = 1
 
+    # Use igraph to make the graph pretty: position nodes better
     points = np.array(ig.Graph.Adjacency(adjancy_matrix, mode="min").layout().coords)
-    points = points - points.min()
-    points = ((points / points.max() + 0.1) * game.size * 0.8)
+    points = points + abs(points.min(0))
+    points = ((points / abs(points).max(0) + 0.02) * game.size * 0.9)
 
-    for point, name in zip(points, node_lookup.keys()):
+    for point, name in zip(points, graph.node_lookup.keys()):
         pygame.draw.circle(game.screen, "purple", point, 5)
-        font_screen = game.font.render(f"{name}{(heuristics_dict[name])}", True, "white", "black")
+        font_screen = game.font.render(f"{name}{(graph.heuristics[graph.node_lookup[name]])}", True, "white", "black")
         game.screen.blit(font_screen, point+5)
 
-    for idx1, idx2 in np.column_stack(np.where(graph_matrix != -1)):
+    for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
         pygame.draw.line(game.screen,"white", points[idx1], points[idx2])
-        font_screen = game.font.render(f"{graph_matrix[idx1, idx2]}", True, "white", "black")
+        font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
         game.screen.blit(font_screen, (points[idx1] + points[idx2])/2-5)
 
-    djakstrar_table = np.ones((graph_matrix.shape[0], 4)) * [np.inf, 0, 0, np.inf] # distance, last_idx, done, estimated_total
-    djakstrar_table[start_idx] = [0, start_idx, 0, 0]
+    pygame.display.flip()
+
+    djakstrar_table = np.ones((graph.graph_matrix.shape[0], 4)) * [np.inf, 0, 0, np.inf] # distance, last_idx, done, estimated_total
+    djakstrar_table[graph.start_idx] = [0, graph.start_idx, 0, 0]
 
     running = True
     can_continue = False
@@ -118,27 +77,26 @@ def start_game(unparsed_save: str, game : Game):
             pygame.draw.circle(game.screen, "green", points[next_idx], 5)
             pygame.draw.line(game.screen, "green", points[next_idx], points[int(djakstrar_table[next_idx, 1])], 5)
 
-            for idx_expand in np.where(graph_matrix[next_idx] != -1)[0]:
-                distance = graph_matrix[next_idx, idx_expand] + djakstrar_table[next_idx, 0]
+            for idx_expand in np.where(graph.graph_matrix[next_idx] != -1)[0]:
+                distance = graph.graph_matrix[next_idx, idx_expand] + djakstrar_table[next_idx, 0]
                 estimated_total = distance \
-                    + heuristics[idx_expand]
+                    + graph.heuristics[idx_expand]
                 # if is not done and distance is smaller than already there
                 if djakstrar_table[idx_expand][2] == 0 \
                     and djakstrar_table[idx_expand][0] > estimated_total:
                     djakstrar_table[idx_expand] = [distance, next_idx, 0, estimated_total]
                     pygame.draw.circle(game.screen, "yellow", points[idx_expand], 5)
         
-                if djakstrar_table[end_idx, 2] == 1:
-                    traverse_idx = end_idx
-                    while traverse_idx != start_idx:
+                if djakstrar_table[graph.end_idx, 2] == 1:
+                    traverse_idx = graph.end_idx
+                    while traverse_idx != graph.start_idx:
                         traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
                         pygame.draw.line(game.screen, "orange", points[traverse_idx], points[traverse_idx2], 5)
                         traverse_idx = traverse_idx2
 
         pygame.display.flip()
 
-        game.clock.tick(60)  # limits FPS to 60
-
+        game.clock.tick(20)  # limits FPS to 60
 
 def select_level_screen(game: Game):
 
@@ -168,6 +126,7 @@ def select_level_screen(game: Game):
             game.screen.blit(save_screen, (0, 20*i))
 
         pygame.display.flip()
+        game.clock.tick(20)
 
 
 def start():

@@ -18,7 +18,8 @@
               numpy
 	      igraph
 	      matplotlib
-              pycairo
+              pycairo # plotting igraph
+	      pytest
              ]);
 	  shellHook = ''
 	    $SHELL
