@@ -17,12 +17,11 @@ def read_file(filename: str):
     with open(filename, "r") as f:
         return f.readlines()
 
-def start_game(unparsed_save: str, game : Game):
+def show_level(unparsed_save: str, game : Game):
 
     offsetX = 0
     offsetY = 0
     zoom = 1
-
 
     graph = savefile.parse_text(unparsed_save)
 
@@ -140,9 +139,9 @@ def start_game(unparsed_save: str, game : Game):
 
         game.clock.tick(20)  # limits FPS to 60
 
-def select_level_screen(game: Game):
+def select_level_screen(game: Game, savedir : str):
 
-    saves = glob.glob("*.graph")
+    saves = glob.glob("*.graph", root_dir=savedir)
 
     selected_save = 0
     running = True
@@ -158,7 +157,7 @@ def select_level_screen(game: Game):
                     selected_save += 1
                 if event.key == pygame.K_RETURN:
                     savefile = read_file(saves[selected_save])
-                    start_game(savefile, game)
+                    show_level(savefile, game)
 
                 selected_save = selected_save % len(saves)
 
@@ -175,7 +174,7 @@ def select_level_screen(game: Game):
         game.clock.tick(20)
 
 
-def start():
+def start_game(safedir = "."):
     # pygame setup
     game = Game()
 
@@ -187,7 +186,7 @@ def start():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    select_level_screen(game)
+                    select_level_screen(game, savedir=safedir)
                     game.screen.fill("black")
 
         # Show Hello Box
@@ -202,6 +201,3 @@ def start():
 
         game.clock.tick(20)
         # pygame.event.wait()
-
-if __name__ == "__main__":
-    start()
