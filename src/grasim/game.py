@@ -3,7 +3,7 @@ import numpy as np
 import igraph as ig
 from dataclasses import dataclass
 from grasim import savefile
-
+import os
 import glob
 
 @dataclass
@@ -142,6 +142,10 @@ def show_level(unparsed_save: str, game : Game):
 def select_level_screen(game: Game, savedir : str):
 
     saves = glob.glob("*.graph", root_dir=savedir)
+    saves = sorted(saves, key=str.lower)
+
+    if len(saves) == 0:
+        saves.append(f"Couldn't find any saves in dir \"{savedir}\". You can start the programm with the -d <Directory> flag")
 
     selected_save = 0
     running = True
@@ -156,8 +160,8 @@ def select_level_screen(game: Game, savedir : str):
                 if event.key == pygame.K_DOWN:
                     selected_save += 1
                 if event.key == pygame.K_RETURN:
-                    savefile = read_file(saves[selected_save])
-                    show_level(savefile, game)
+                    graphtext = read_file(os.path.join(savedir, saves[selected_save]))
+                    show_level(graphtext, game)
 
                 selected_save = selected_save % len(saves)
 
@@ -200,4 +204,3 @@ def start_game(safedir = "."):
         pygame.display.flip()
 
         game.clock.tick(20)
-        # pygame.event.wait()

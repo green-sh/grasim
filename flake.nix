@@ -22,7 +22,7 @@
 	      pytest
              ]);
 	  shellHook = ''
-	    $SHELL
+	    source .venv/bin/activate
 	  '';
         };
       });
