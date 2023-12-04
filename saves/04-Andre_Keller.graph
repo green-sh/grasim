@@ -1,0 +1,14 @@
+A(6)
+B(4)
+C(2)
+D(0)
+Z(0)
+
+A -3- B
+A -2- C
+C -4- D
+B -1- D
+D -3- Z
+
+START A
+END Z

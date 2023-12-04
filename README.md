@@ -6,7 +6,7 @@ This is a implementation of Dijkstra and A* in pygame.
 - (Optional) Create a venv using `python -m venv .venv`
 - Install Poetry using `pip install poetry`
 - Install game using `poetry install` in the root of this repository
-- You can now use `grasim` to start
+- You can now use `grasim -d saves` to start using preconfigured saves
 
 ## Functionalities
 - load graph files in local directory

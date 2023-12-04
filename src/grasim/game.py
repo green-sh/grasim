@@ -3,6 +3,7 @@ import numpy as np
 import igraph as ig
 from dataclasses import dataclass
 from grasim import savefile
+from grasim.dijkstra import dijkstra
 import os
 import glob
 
@@ -34,12 +35,12 @@ def show_level(unparsed_save: str, game : Game):
     points = points + abs(points.min(0))
     points = ((points / abs(points).max(0) + 0.02) * game.screen.get_size() * 0.9)
 
-    djakstrar_table = np.ones((graph.graph_matrix.shape[0], 4)) * [np.inf, 0, 0, np.inf] # distance, last_idx, done, estimated_total
-    djakstrar_table[graph.start_idx] = [0, graph.start_idx, 0, 0]
+    djakstrar_table = dijkstra.init_dijkstra_table(num_nodes=graph.graph_matrix.shape[0], start_idx = graph.start_idx)
 
     running = True
     can_continue = False
     should_draw = True
+    admissability = "Unkown"
     while running:
 
         if should_draw:
@@ -74,8 +75,10 @@ def show_level(unparsed_save: str, game : Game):
                     pygame.draw.line(game.screen,"orange", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
                     traverse_idx = traverse_idx2
 
-            
-            font_screen = game.font.render("inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
+            # font_screen = game.font.render("inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
+            # game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
+
+            font_screen = game.font.render(f"Adminssable: {admissability}", True, "white", "black")
             game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
             # End drawing
         
@@ -115,26 +118,11 @@ def show_level(unparsed_save: str, game : Game):
             offsetY += game.screen.get_size()[1]*0.1/2
             should_draw = True
 
-        # expand
-        valid_idx = np.where((djakstrar_table[:, 2] == 0) & (djakstrar_table[:, 3] != np.inf))[0]
-
-        # if there is a valid node left to explore
-        if (len(valid_idx) != 0) and can_continue:
+        if can_continue:
             can_continue = False
-            next_idx = valid_idx[djakstrar_table[valid_idx, 3].argmin()]
-
-            djakstrar_table[next_idx][2] = 1
-
-            for idx_expand in np.where(graph.graph_matrix[next_idx] != -1)[0]:
-                distance = graph.graph_matrix[next_idx, idx_expand] + djakstrar_table[next_idx, 0]
-                estimated_total = distance \
-                    + graph.heuristics[idx_expand]
-                # if is not done and distance is smaller than already there
-                if djakstrar_table[idx_expand][2] == 0 \
-                    and djakstrar_table[idx_expand][0] > estimated_total:
-                    djakstrar_table[idx_expand] = [distance, next_idx, 0, estimated_total]
+            dijkstra.dijkstra_step(djakstrar_table, graph)
+            admissability = "Yes" if dijkstra.check_admissablity(djakstrar_table=djakstrar_table, heuristics=graph.heuristics) else "No"
         
-
         pygame.display.flip()
 
         game.clock.tick(20)  # limits FPS to 60

@@ -9,7 +9,7 @@ NodeDistance = tuple[str, int, str]
 
 @dataclass
 class WaypointGraph:
-    graph_matrix : nptype.NDArray[Any] # Adjancy with distances
+    graph_matrix : nptype.NDArray[Any] # Adjancy with distances, -1 means not connected
     start_idx : int
     end_idx : int
     node_lookup : dict[str, int] # NodeName => index in graph_matrix
