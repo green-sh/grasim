@@ -8,11 +8,19 @@ This is a implementation of Dijkstra and A* in pygame.
 - Install game using `poetry install` in the root of this repository
 - You can now use `grasim -d saves` to start using preconfigured saves
 
-## Functionalities
-- load graph files in local directory
+# Navigation
+`<Return>` go back\
+`<Enter>` choose or continue\
+`+` / `-` zoom in / out graph\
+`<left>/<right>/<up>/<down>` move around in graph
 
-## Graph language
+
+# Graph language
 Safefiles are loaded when they are in the local folder and end with `.graph`
+
+The directory where to look for `.graph` files can be changed via the commandline:
+`grasim --diretory path-to-saves`
+
 ## Syntax
 ```
 NodeA -<length>- NodeB
@@ -20,6 +28,8 @@ NodeA(<heuristic>)
 ```
 
 ## Example
+![image of graph](saves/images/folien.png)
+Code for graph above
 ```
 A(10)
 B(7)

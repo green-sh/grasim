@@ -9,21 +9,22 @@
       });
     in
     {
+      formatter = forEachSupportedSystem ({ pkgs }: pkgs.nixpkgs-fmt);
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
           packages = with pkgs; [ python311 virtualenv ] ++
-            (with pkgs.python311Packages; [ 
+            (with pkgs.python311Packages; [
               pip
               pygame
               numpy
-	      igraph
-	      matplotlib
+              igraph
+              matplotlib
               pycairo # plotting igraph
-	      pytest
-             ]);
-	  shellHook = ''
-	    source .venv/bin/activate
-	  '';
+              pytest
+            ]);
+          shellHook = ''
+            	    source .venv/bin/activate
+            	  '';
         };
       });
     };
