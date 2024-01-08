@@ -13,9 +13,8 @@ def init_dijkstra_table(num_nodes, start_idx):
     return dijkstra_table
 
 
-dijkstra_mode = Literal[True, False]
 
-def dijkstra_step(dijkstra_table, graph : WaypointGraph, mode : dijkstra_mode) -> bool:
+def dijkstra_step(dijkstra_table, graph : WaypointGraph, dijkstra_mode : bool) -> bool:
     """
     Do a dijkstra step
 
@@ -33,13 +32,8 @@ def dijkstra_step(dijkstra_table, graph : WaypointGraph, mode : dijkstra_mode) -
         dijkstra_table[next_idx][2] = 1
 
         for idx_expand in np.where(graph.graph_matrix[next_idx] != -1)[0]:
-            
-            # Turn A* on or off
-            graph_heuristic = graph.heuristics[idx_expand] if not dijkstra_mode else 0
-
             distance = graph.graph_matrix[next_idx, idx_expand] + dijkstra_table[next_idx, 0]
-            estimated_total = distance \
-                + graph_heuristic
+            estimated_total = distance + (0 if dijkstra_mode else graph.heuristics[idx_expand])
             # if is not done and distance is smaller than already there
             if dijkstra_table[idx_expand][2] == 0 \
                 and dijkstra_table[idx_expand][0] > estimated_total:

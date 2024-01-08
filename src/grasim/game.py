@@ -55,10 +55,10 @@ def show_level(unparsed_save: str, game : Game):
                 node_idx = graph.node_lookup[name]
                 if graph.end_idx == node_idx:
                     pygame.draw.circle(game.screen, "yellow", point, 5)
-                elif djakstrar_table[node_idx, 2] != 1:
-                    pygame.draw.circle(game.screen, "orange", point, 5)
                 elif djakstrar_table[node_idx, 0] == np.inf:
                     pygame.draw.circle(game.screen, "purple", point, 5)
+                elif djakstrar_table[node_idx, 2] != 1:
+                    pygame.draw.circle(game.screen, "orange", point, 5)
                 else:
                     pygame.draw.circle(game.screen, "green", point, 5)
                 
