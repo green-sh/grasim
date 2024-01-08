@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from grasim import savefile
 from grasim.dijkstra import dijkstra
 import os
-import glob
+import pathlib
 
 @dataclass
 class Game:
@@ -55,10 +55,10 @@ def show_level(unparsed_save: str, game : Game):
                 node_idx = graph.node_lookup[name]
                 if graph.end_idx == node_idx:
                     pygame.draw.circle(game.screen, "yellow", point, 5)
-                elif djakstrar_table[node_idx, 0] == np.inf:
-                    pygame.draw.circle(game.screen, "purple", point, 5)
                 elif djakstrar_table[node_idx, 2] != 1:
                     pygame.draw.circle(game.screen, "orange", point, 5)
+                elif djakstrar_table[node_idx, 0] == np.inf:
+                    pygame.draw.circle(game.screen, "purple", point, 5)
                 else:
                     pygame.draw.circle(game.screen, "green", point, 5)
                 
@@ -137,14 +137,13 @@ def show_level(unparsed_save: str, game : Game):
         game.clock.tick(20)  # limits FPS to 60
 
 
-def select_level_screen(game: Game, savedir : str):
+def select_level_screen(game: Game, savedir : pathlib.Path):
 
-    saves = glob.glob("*.graph", root_dir=savedir)
-    saves = sorted(saves, key=str.lower)
+    saves = [x for x in savedir.glob("*") if x.is_dir or x.suffix == ".graph"]
+    # saves = sorted(saves, key=lambda x: str.lower(x.name))
 
     if len(saves) == 0:
-        saves.append(f"Couldn't find any saves in dir \"{savedir}\". You can start the programm with the -d <Directory> flag")
-
+        saves.append(f"Couldn't find any saves in dir \"{savedir.name}\". You can start the programm with the -d <Directory> flag")
     # saves.append("random")
 
     selected_save_id = 0
@@ -164,11 +163,14 @@ def select_level_screen(game: Game, savedir : str):
                 if event.key == pygame.K_BACKSPACE:
                     running = False
                 if event.key == pygame.K_RETURN:
-                    if saves[selected_save_id] == "random":
-                        graphtext = create_random_graph()
+                    if saves[selected_save_id].is_dir():
+                        savedir = saves[selected_save_id]
+                        saves = [x for x in savedir.glob("*") if x.is_dir or x.suffix == ".graph"] \
+                                + [ savedir.joinpath("..") ]
+
                     else:
                         graphtext = read_file(os.path.join(savedir, saves[selected_save_id]))
-                    show_level(graphtext, game)
+                        show_level(graphtext, game)
 
                 selected_save_id = selected_save_id % len(saves)
 
@@ -179,7 +181,7 @@ def select_level_screen(game: Game, savedir : str):
             color = "black"
             if savename == saves[selected_save_id]:
                 color = "red"
-            save_screen = game.font.render(savename, 1, "white", color)
+            save_screen = game.font.render(savename.name, 1, "white", color)
             game.screen.blit(save_screen, (0, 20*i))
         
         if game.dijkstra_mode: # If dijkstra is chosen
@@ -205,7 +207,7 @@ def start_game(safedir = "."):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    select_level_screen(game, savedir=safedir)
+                    select_level_screen(game, savedir=pathlib.Path(safedir))
                     game.screen.fill("black")
 
         # Show Hello Box

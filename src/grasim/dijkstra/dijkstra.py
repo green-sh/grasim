@@ -12,8 +12,6 @@ def init_dijkstra_table(num_nodes, start_idx):
     dijkstra_table[start_idx] = [0, start_idx, 0, 0]
     return dijkstra_table
 
-
-
 def dijkstra_step(dijkstra_table, graph : WaypointGraph, dijkstra_mode : bool) -> bool:
     """
     Do a dijkstra step
