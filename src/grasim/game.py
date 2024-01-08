@@ -1,3 +1,4 @@
+from grasim.graph_generator import create_random_graph
 import pygame
 import numpy as np
 import igraph as ig
@@ -10,7 +11,7 @@ import glob
 @dataclass
 class Game:
     pygame.init()
-    screen = pygame.display.set_mode((1280, 720))
+    screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
     clock = pygame.time.Clock()
     font = pygame.font.Font(pygame.font.get_default_font())
 
@@ -136,7 +137,7 @@ def select_level_screen(game: Game, savedir : str):
     if len(saves) == 0:
         saves.append(f"Couldn't find any saves in dir \"{savedir}\". You can start the programm with the -d <Directory> flag")
 
-    saves.append("random")
+    # saves.append("random")
 
     selected_save_id = 0
     running = True
@@ -145,7 +146,6 @@ def select_level_screen(game: Game, savedir : str):
             if event.type == pygame.QUIT:
                 running = False
 
-            # Keyboard events
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     selected_save_id -= 1
