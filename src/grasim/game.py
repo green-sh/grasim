@@ -54,9 +54,9 @@ def show_level(unparsed_save: str, game : Game):
                 if djakstrar_table[graph.node_lookup[name], 0] == np.inf:
                     pygame.draw.circle(game.screen, "purple", point, 5)
                 elif djakstrar_table[graph.node_lookup[name], 2] != 1:
-                    pygame.draw.circle(game.screen, "green", point, 5)
-                else:
                     pygame.draw.circle(game.screen, "orange", point, 5)
+                else:
+                    pygame.draw.circle(game.screen, "green", point, 5)
                 font_screen = game.font.render(f"{name}{(graph.heuristics[graph.node_lookup[name]])}", True, "white", "black")
                 game.screen.blit(font_screen, point+5)
 
@@ -73,7 +73,7 @@ def show_level(unparsed_save: str, game : Game):
                 traverse_idx = graph.end_idx
                 while traverse_idx != graph.start_idx:
                     traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
-                    pygame.draw.line(game.screen,"orange", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
+                    pygame.draw.line(game.screen,"yellow", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
                     traverse_idx = traverse_idx2
 
             font_screen = game.font.render("inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
