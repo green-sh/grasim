@@ -48,14 +48,17 @@ def show_level(unparsed_save: str, game : Game):
             should_draw = False
             # drawing everything
             game.screen.fill("black")
-            draw_points = points * zoom + [offsetX, offsetY]
+            points_absolute_pos = points * zoom + [offsetX, offsetY]
             # Draw nodes
-            for point, name in zip(draw_points, graph.node_lookup.keys()):
+            for point, name in zip(points_absolute_pos, graph.node_lookup.keys()):
                 # If node is not done draw purple, otherwise green
-                if djakstrar_table[graph.node_lookup[name], 0] == np.inf:
-                    pygame.draw.circle(game.screen, "purple", point, 5)
-                elif djakstrar_table[graph.node_lookup[name], 2] != 1:
+                node_idx = graph.node_lookup[name]
+                if graph.end_idx == node_idx:
+                    pygame.draw.circle(game.screen, "yellow", point, 5)
+                elif djakstrar_table[node_idx, 2] != 1:
                     pygame.draw.circle(game.screen, "orange", point, 5)
+                elif djakstrar_table[node_idx, 0] == np.inf:
+                    pygame.draw.circle(game.screen, "purple", point, 5)
                 else:
                     pygame.draw.circle(game.screen, "green", point, 5)
                 
@@ -64,22 +67,23 @@ def show_level(unparsed_save: str, game : Game):
                 font_screen = game.font.render(f"{name}{heuristic_text}", True, "white", "black")
                 game.screen.blit(font_screen, point+5)
 
-            # Draw Paths
-            for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
-                # if path is explored draw green otherwise white
-                if ((int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0) or ((int(djakstrar_table[idx2, 1]) == idx1) and djakstrar_table[idx2, 2] == 1.0):
-                    pygame.draw.line(game.screen,"green", draw_points[idx1], draw_points[idx2], 5)
-                else:
-                    pygame.draw.line(game.screen,"white", draw_points[idx1], draw_points[idx2])
-                font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
-                game.screen.blit(font_screen, (draw_points[idx1] + draw_points[idx2])/2-5)
-
             if djakstrar_table[graph.end_idx, 2] == 1:
                 traverse_idx = graph.end_idx
                 while traverse_idx != graph.start_idx:
                     traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
-                    pygame.draw.line(game.screen,"yellow", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
+                    pygame.draw.line(game.screen,"yellow", points_absolute_pos[traverse_idx], points_absolute_pos[traverse_idx2], 10)
                     traverse_idx = traverse_idx2
+
+            # Draw Paths
+            for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
+                # if path is explored draw green otherwise white
+                if ((int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0) or ((int(djakstrar_table[idx2, 1]) == idx1) and djakstrar_table[idx2, 2] == 1.0):
+                    pygame.draw.line(game.screen,"green", points_absolute_pos[idx1], points_absolute_pos[idx2], 5)
+                else:
+                    pygame.draw.line(game.screen,"white", points_absolute_pos[idx1], points_absolute_pos[idx2])
+                font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
+                game.screen.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
+
 
             font_screen = game.font.render("Inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
