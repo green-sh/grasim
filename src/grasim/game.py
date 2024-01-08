@@ -43,9 +43,10 @@ def show_level(unparsed_save: str, game : Game):
     can_continue = False
     should_draw = True
     counter = 0
+    skip_until_end = False
     while running:
 
-        if should_draw:
+        if should_draw or skip_until_end:
             should_draw = False
             # drawing everything
             game.screen.fill("black")
@@ -69,6 +70,7 @@ def show_level(unparsed_save: str, game : Game):
                 game.screen.blit(font_screen, point+5)
 
             if djakstrar_table[graph.end_idx, 2] == 1:
+                skip_until_end = False
                 traverse_idx = graph.end_idx
                 while traverse_idx != graph.start_idx:
                     traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
@@ -86,7 +88,7 @@ def show_level(unparsed_save: str, game : Game):
                 game.screen.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
 
 
-            font_screen = game.font.render("Inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
+            font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, C | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
 
             counter_screen = game.font.render(f"Steps: {counter}", True, "white", "black")
@@ -128,8 +130,10 @@ def show_level(unparsed_save: str, game : Game):
             offsetX += game.screen.get_size()[0]*0.1/2
             offsetY += game.screen.get_size()[1]*0.1/2
             should_draw = True
+        elif keys[pygame.K_c]:
+            skip_until_end = True
 
-        if can_continue:
+        if can_continue or skip_until_end:
             can_continue = False
             if dijkstra.dijkstra_step(djakstrar_table, graph, game.dijkstra_mode):
                 counter += 1
