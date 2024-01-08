@@ -21,7 +21,7 @@ def read_file(filename: str):
         return f.readlines()
 
 def show_level(unparsed_save: str, game : Game):
-
+    """The level screen"""
     offsetX = 0
     offsetY = 0
     zoom = 1
@@ -42,7 +42,6 @@ def show_level(unparsed_save: str, game : Game):
     running = True
     can_continue = False
     should_draw = True
-    admissability = "Unkown"
     while running:
 
         if should_draw:
@@ -50,6 +49,7 @@ def show_level(unparsed_save: str, game : Game):
             # drawing everything
             game.screen.fill("black")
             draw_points = points * zoom + [offsetX, offsetY]
+            # Draw nodes
             for point, name in zip(draw_points, graph.node_lookup.keys()):
                 # If node is not done draw purple, otherwise green
                 if djakstrar_table[graph.node_lookup[name], 0] == np.inf:
@@ -58,9 +58,13 @@ def show_level(unparsed_save: str, game : Game):
                     pygame.draw.circle(game.screen, "orange", point, 5)
                 else:
                     pygame.draw.circle(game.screen, "green", point, 5)
-                font_screen = game.font.render(f"{name}{(graph.heuristics[graph.node_lookup[name]])}", True, "white", "black")
+                
+                heuristic_text = "" if game.dijkstra_mode else graph.heuristics[graph.node_lookup[name]]
+
+                font_screen = game.font.render(f"{name}{heuristic_text}", True, "white", "black")
                 game.screen.blit(font_screen, point+5)
 
+            # Draw Paths
             for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
                 # if path is explored draw green otherwise white
                 if ((int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0) or ((int(djakstrar_table[idx2, 1]) == idx1) and djakstrar_table[idx2, 2] == 1.0):
@@ -77,7 +81,7 @@ def show_level(unparsed_save: str, game : Game):
                     pygame.draw.line(game.screen,"yellow", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
                     traverse_idx = traverse_idx2
 
-            font_screen = game.font.render("inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
+            font_screen = game.font.render("Inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
 
             # font_screen = game.font.render(f"Adminssable: {admissability}", True, "white", "black")
