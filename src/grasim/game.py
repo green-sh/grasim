@@ -16,8 +16,8 @@ class Game:
     font = pygame.font.Font(pygame.font.get_default_font())
     dijkstra_mode = False
 
-def read_file(filename: str):
-    with open(filename, "r") as f:
+def read_file(file: pathlib.Path):
+    with file.open("r") as f:
         return f.readlines()
 
 def show_level(unparsed_save: str, game : Game):
@@ -42,6 +42,7 @@ def show_level(unparsed_save: str, game : Game):
     running = True
     can_continue = False
     should_draw = True
+    counter = 0
     while running:
 
         if should_draw:
@@ -88,8 +89,8 @@ def show_level(unparsed_save: str, game : Game):
             font_screen = game.font.render("Inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
 
-            # font_screen = game.font.render(f"Adminssable: {admissability}", True, "white", "black")
-            # game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
+            counter_screen = game.font.render(f"Steps: {counter}", True, "white", "black")
+            game.screen.blit(counter_screen, (game.screen.get_size()[0] - counter_screen.get_size()[0], font_screen.get_size()[1]))
             # End drawing
         
         # poll for events
@@ -130,7 +131,8 @@ def show_level(unparsed_save: str, game : Game):
 
         if can_continue:
             can_continue = False
-            dijkstra.dijkstra_step(djakstrar_table, graph, game.dijkstra_mode)
+            if dijkstra.dijkstra_step(djakstrar_table, graph, game.dijkstra_mode):
+                counter += 1
         
         pygame.display.flip()
 
@@ -167,9 +169,8 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
                         savedir = saves[selected_save_id]
                         saves = [x for x in savedir.glob("*") if x.is_dir or x.suffix == ".graph"] \
                                 + [ savedir.joinpath("..") ]
-
                     else:
-                        graphtext = read_file(os.path.join(savedir, saves[selected_save_id]))
+                        graphtext = read_file(saves[selected_save_id])
                         show_level(graphtext, game)
 
                 selected_save_id = selected_save_id % len(saves)
