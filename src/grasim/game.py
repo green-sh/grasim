@@ -14,6 +14,7 @@ class Game:
     screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
     clock = pygame.time.Clock()
     font = pygame.font.Font(pygame.font.get_default_font())
+    dijkstra_mode = False
 
 def read_file(filename: str):
     with open(filename, "r") as f:
@@ -121,8 +122,7 @@ def show_level(unparsed_save: str, game : Game):
 
         if can_continue:
             can_continue = False
-            dijkstra.dijkstra_step(djakstrar_table, graph)
-            admissability = "Yes" if dijkstra.check_admissablity(djakstrar_table=djakstrar_table, heuristics=graph.heuristics) else "No"
+            dijkstra.dijkstra_step(djakstrar_table, graph, game.dijkstra_mode)
         
         pygame.display.flip()
 
@@ -147,6 +147,8 @@ def select_level_screen(game: Game, savedir : str):
                 running = False
 
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_d:
+                    game.dijkstra_mode = not game.dijkstra_mode
                 if event.key == pygame.K_UP:
                     selected_save_id -= 1
                 if event.key == pygame.K_DOWN:
@@ -171,6 +173,13 @@ def select_level_screen(game: Game, savedir : str):
                 color = "red"
             save_screen = game.font.render(savename, 1, "white", color)
             game.screen.blit(save_screen, (0, 20*i))
+        
+        if game.dijkstra_mode: # If dijkstra is chosen
+            dijkstramode_text = "Current mode is: Dijkstra   Press D to switch to A*"
+        else:
+            dijkstramode_text = "Current mode is: A*         Press D to switch to Dijkstra"
+        dijkstramode_font = game.font.render(dijkstramode_text, 1, "white", "black")
+        game.screen.blit(dijkstramode_font, (game.screen.get_size()[0]-dijkstramode_font.get_size()[0], game.screen.get_size()[1]-20))
 
         pygame.display.flip()
         game.clock.tick(20)

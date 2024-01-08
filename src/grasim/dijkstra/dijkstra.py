@@ -1,5 +1,6 @@
 import numpy as np
 from grasim.savefile import WaypointGraph
+from typing import Literal, TypeVar
 
 
 def init_dijkstra_table(num_nodes, start_idx):
@@ -11,14 +12,17 @@ def init_dijkstra_table(num_nodes, start_idx):
     dijkstra_table[start_idx] = [0, start_idx, 0, 0]
     return dijkstra_table
 
-def dijkstra_step(dijkstra_table, graph : WaypointGraph) -> bool:
+
+dijkstra_mode = Literal[True, False]
+
+def dijkstra_step(dijkstra_table, graph : WaypointGraph, mode : dijkstra_mode) -> bool:
     """
     Do a dijkstra step
 
     warning: this does change the dijkstra_table
     
     """
-    # find minimal node
+    # find first valid node
     valid_idx = np.where((dijkstra_table[:, 2] == 0) & (dijkstra_table[:, 3] != np.inf))[0]
 
     # if there is a valid node left to explore
@@ -29,9 +33,13 @@ def dijkstra_step(dijkstra_table, graph : WaypointGraph) -> bool:
         dijkstra_table[next_idx][2] = 1
 
         for idx_expand in np.where(graph.graph_matrix[next_idx] != -1)[0]:
+            
+            # Turn A* on or off
+            graph_heuristic = graph.heuristics[idx_expand] if not dijkstra_mode else 0
+
             distance = graph.graph_matrix[next_idx, idx_expand] + dijkstra_table[next_idx, 0]
             estimated_total = distance \
-                + graph.heuristics[idx_expand]
+                + graph_heuristic
             # if is not done and distance is smaller than already there
             if dijkstra_table[idx_expand][2] == 0 \
                 and dijkstra_table[idx_expand][0] > estimated_total:
@@ -40,9 +48,3 @@ def dijkstra_step(dijkstra_table, graph : WaypointGraph) -> bool:
         return True
     else:
         return False
-
-
-def check_admissablity(djakstrar_table, heuristics):
-    # Every distance should be bigger than the heuristic
-    # TODO: FIX
-    return np.all(heuristics <= djakstrar_table[:, 0])
