@@ -1,2 +1,1 @@
-.venv/Scripts/activate
-grasim -d saves
+poetry run grasim -d saves

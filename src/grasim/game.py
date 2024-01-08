@@ -75,11 +75,11 @@ def show_level(unparsed_save: str, game : Game):
                     pygame.draw.line(game.screen,"orange", draw_points[traverse_idx], draw_points[traverse_idx2], 5)
                     traverse_idx = traverse_idx2
 
-            # font_screen = game.font.render("inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
-            # game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
-
-            font_screen = game.font.render(f"Adminssable: {admissability}", True, "white", "black")
+            font_screen = game.font.render("inputs: <ENTER>, <BACK>, +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
+
+            # font_screen = game.font.render(f"Adminssable: {admissability}", True, "white", "black")
+            # game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
             # End drawing
         
         # poll for events
@@ -127,6 +127,7 @@ def show_level(unparsed_save: str, game : Game):
 
         game.clock.tick(20)  # limits FPS to 60
 
+
 def select_level_screen(game: Game, savedir : str):
 
     saves = glob.glob("*.graph", root_dir=savedir)
@@ -135,29 +136,38 @@ def select_level_screen(game: Game, savedir : str):
     if len(saves) == 0:
         saves.append(f"Couldn't find any saves in dir \"{savedir}\". You can start the programm with the -d <Directory> flag")
 
-    selected_save = 0
+    saves.append("random")
+
+    selected_save_id = 0
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
+            # Keyboard events
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    selected_save -= 1
+                    selected_save_id -= 1
                 if event.key == pygame.K_DOWN:
-                    selected_save += 1
+                    selected_save_id += 1
+                if event.key == pygame.K_BACKSPACE:
+                    running = False
                 if event.key == pygame.K_RETURN:
-                    graphtext = read_file(os.path.join(savedir, saves[selected_save]))
+                    if saves[selected_save_id] == "random":
+                        graphtext = create_random_graph()
+                    else:
+                        graphtext = read_file(os.path.join(savedir, saves[selected_save_id]))
                     show_level(graphtext, game)
 
-                selected_save = selected_save % len(saves)
+                selected_save_id = selected_save_id % len(saves)
 
         game.screen.fill("black")        
-
-        for i, savename in enumerate(saves[selected_save:] + saves[:selected_save]):
+        
+        # Draw
+        for i, savename in enumerate(saves[selected_save_id:] + saves[:selected_save_id]):
             color = "black"
-            if savename == saves[selected_save]:
+            if savename == saves[selected_save_id]:
                 color = "red"
             save_screen = game.font.render(savename, 1, "white", color)
             game.screen.blit(save_screen, (0, 20*i))
