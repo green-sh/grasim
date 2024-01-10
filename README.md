@@ -21,10 +21,22 @@ Safefiles are loaded when they are in the local folder and end with `.graph`
 The directory where to look for `.graph` files can be changed via the commandline:
 `grasim --diretory path-to-saves`
 
+## Minimal Example
+if you don't specify heuristics they are considered as 0
+```
+A -1- B
+
+START A
+END B
+```
 ## Syntax
 ```
-NodeA -<length>- NodeB
-NodeA(<heuristic>)
+<NodeName> -<length>- NodeB
+<NodeName>(<heuristic>)
+
+
+START <NodeName>
+END <NodeName>
 ```
 
 ## Example
