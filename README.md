@@ -27,22 +27,23 @@ This is a implementation of Dijkstra and A* in pygame.
 
 ## Keymapping
 ### Selection screen
-| Keys          | Describtion                                                                                     |
-| ------------- | ----------------------------------------------------------------------------------------------- |
-|               |                                                                                                 |
+
+| Keys            | Describtion                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+|                 |                                                                                                 |
 | `<up>`/`<down>` | to select the graph                                                                             |
-| `<Enter>`     | to load the selected graph                                                                      |
-| `<Return>`    | to go back to the title screen, this is useful if you want to reload the graph selection screen |
-| `D`           | To toggle between Dijkstra and A*                                                               |
+| `<Enter>`       | to load the selected graph                                                                      |
+| `<Return>`      | to go back to the title screen, this is useful if you want to reload the graph selection screen |
+| `D`             | To toggle between Dijkstra and A*                                                               |
 
 ### Navigation
-| Keys                               | Describtion          |
-| ---------------------------------- | -------------------- |
-| `<Return>`                         | go back              |
-| `<Enter>`                          | choose or continue   |
-| `+` / `-`                          | zoom in / out graph  |
-| `<left>`/`<right>`/`<up>`/`<down>` | move around in graph |
-
+| Keys                               | Describtion                       |
+| ---------------------------------- | --------------------------------- |
+| `<Return>`                         | go back                           |
+| `<Enter>`                          | choose or continue                |
+| `+` / `-`                          | zoom in / out graph               |
+| `<left>`/`<right>`/`<up>`/`<down>` | move around in graph              |
+| `c`                                | to continue until best path found |
 
 ## Graph language
 Safefiles are loaded when they are in the `saves/` (by default) folder and end with `.graph`
