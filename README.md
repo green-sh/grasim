@@ -1,5 +1,6 @@
 # Simulation of Dijkstra or A*
 This is a implementation of Dijkstra and A* in pygame.
+![video of simulation](images/sbahn.gif)
 
 ## Installation
 - Install Python 3.11
@@ -8,8 +9,8 @@ This is a implementation of Dijkstra and A* in pygame.
 - Install game using `poetry install` in the root of this repository
 - You can now use `grasim -d saves` to start using preconfigured saves
 
-# Keymapping
-## Selection screen
+## Keymapping
+### Selection screen
 | Keys          | Describtion                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------- |
 |               |                                                                                                 |
@@ -18,7 +19,7 @@ This is a implementation of Dijkstra and A* in pygame.
 | `<Return>`    | to go back to the title screen, this is useful if you want to reload the graph selection screen |
 | `D`           | To toggle between Dijkstra and A*                                                               |
 
-## Navigation
+### Navigation
 | Keys                         | Describtion          |
 | ---------------------------- | -------------------- |
 | `<Return>`                   | go back              |
@@ -27,13 +28,13 @@ This is a implementation of Dijkstra and A* in pygame.
 | `<left>/<right>/<up>/<down>` | move around in graph |
 
 
-# Graph language
+## Graph language
 Safefiles are loaded when they are in the `saves/` (by default) folder and end with `.graph`
 
 The directory where to look for `.graph` files can be changed via the commandline:
 `grasim --diretory path-to-saves`
 
-## Minimal Example
+### Minimal Example
 if you don't specify heuristics they 0
 ```
 A -1- B
@@ -42,7 +43,7 @@ START A
 END B
 ```
 
-## Syntax
+### Syntax
 ```
 <NodeName>(<heuristic>)
 <NodeName> -<length>- NodeB
@@ -66,8 +67,7 @@ The heuristic is 0 if you do not specify otherwise
 If you want to organize your graphs you can use subdirectories to group them. An example is provided.
 
 ## Example
-![image of graph](saves/images/folien.png)
-Code for graph above
+Code for graph below
 ```
 A(10)
 B(7)
@@ -101,3 +101,4 @@ D -1- Z
 START G
 END Z
 ```
+![image of example graph](images/folien.png)

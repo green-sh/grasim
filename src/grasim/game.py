@@ -151,6 +151,10 @@ def show_level(unparsed_save: str, game : Game):
         
         pygame.display.flip()
 
+        # use this to make screen video
+        # filename = "screen_%04d.png" % ( counter )
+        # pygame.image.save( game.screen, filename )
+
         game.clock.tick(20)  # limits FPS to 60
 
 
