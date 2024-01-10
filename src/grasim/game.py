@@ -19,6 +19,9 @@ class Game:
 def read_file(file: pathlib.Path):
     with file.open("r") as f:
         return f.readlines()
+    
+def interpolate_coords(point1 : np.ndarray, point2 : np.ndarray, percent : float) -> np.ndarray:
+    return (point2 - point1) * percent + point1 
 
 def show_level(unparsed_save: str, game : Game):
     """The level screen"""
@@ -79,15 +82,22 @@ def show_level(unparsed_save: str, game : Game):
 
             # Draw Paths
             for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != 0)):
+
                 # if path is explored draw green otherwise white
                 if ((int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0) or \
                     ((int(djakstrar_table[idx2, 1]) == idx1) and djakstrar_table[idx2, 2] == 1.0):
                     pygame.draw.line(game.screen,"green", points_absolute_pos[idx1], points_absolute_pos[idx2], 5)
                 else:
                     pygame.draw.line(game.screen,"white", points_absolute_pos[idx1], points_absolute_pos[idx2])
-                font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
-                game.screen.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
-
+                # check if connection is directed
+                if graph.graph_matrix[idx1, idx2] == graph.graph_matrix[idx2, idx1]:
+                    font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
+                    game.screen.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
+                else: # directed
+                    font_screen_left = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
+                    font_screen_right = game.font.render(f"{graph.graph_matrix[idx2, idx1]}", True, "white", "black")
+                    game.screen.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
+                    game.screen.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
 
             font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, C | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())

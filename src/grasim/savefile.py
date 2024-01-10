@@ -24,6 +24,7 @@ def parse_text(unparsed_text : list[str]):
     end : str | None = None 
 
     node_node_connection_regex = re.compile(r"(\w+) -(\d+)- (\w+)")
+    node_node_connection_both_regex = re.compile(r"(\w+) <-(\d+)-> (\w+)")
     node_node_connection_left_regex = re.compile(r"(\w+) <-(\d+)- (\w+)")
     node_node_connection_right_regex = re.compile(r"(\w+) -(\d+)-> (\w+)")
     node_heuristic_regex = re.compile(r"(\w+)\((\d+)\)")
@@ -31,22 +32,22 @@ def parse_text(unparsed_text : list[str]):
     node_end_regex = re.compile(r"END (\w+)")
 
     for line_idx, line in enumerate(unparsed_text):        
-        if match := node_node_connection_left_regex.match(line):
-            node1, estimated_total, node2 = match.groups()
-            nodes.add(node1)
-            nodes.add(node2)
-            distances.append((node1, float(estimated_total), node2))
-        elif match := node_node_connection_right_regex.match(line):
-            node1, estimated_total, node2 = match.groups()
-            nodes.add(node1)
-            nodes.add(node2)
-            distances.append((node1, float(estimated_total), node2))
-        elif match := node_node_connection_regex.match(line):
+        if match := node_node_connection_regex.match(line) or node_node_connection_both_regex.match(line):
             node1, estimated_total, node2 = match.groups()
             nodes.add(node1)
             nodes.add(node2)
             distances.append((node1, float(estimated_total), node2))
             distances.append((node2, float(estimated_total), node1))
+        elif match := node_node_connection_left_regex.match(line):
+            node1, estimated_total, node2 = match.groups()
+            nodes.add(node1)
+            nodes.add(node2)
+            distances.append((node2, float(estimated_total), node1))
+        elif match := node_node_connection_right_regex.match(line):
+            node1, estimated_total, node2 = match.groups()
+            nodes.add(node1)
+            nodes.add(node2)
+            distances.append((node1, float(estimated_total), node2))
         elif match := node_heuristic_regex.match(line):
             node, heuristic = match.groups()
             heuristics_dict[node] = float(heuristic)

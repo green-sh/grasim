@@ -1,4 +1,5 @@
 A <-1- B
+B -1-> B
 
 START A
 END B
