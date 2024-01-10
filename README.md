@@ -15,6 +15,7 @@ This is a implementation of Dijkstra and A* in pygame.
   - [Heuristics](#heuristics)
   - [Subdirectories](#subdirectories)
 - [Example](#example)
+- [References](#references)
 
 
 ## Installation
@@ -117,3 +118,7 @@ START G
 END Z
 ```
 ![image of example graph](images/folien.png)
+
+## References
+- This project uses [python-igraph](https://github.com/igraph/python-igraph) to layout the graphs
+- Thanks to [Sebastion Iwanowski](https://www.fh-wedel.de/wir/organisation/team/detail/profil/profile/show/Sebastian-Iwanowski/) for feedback and support. A* and Dijkstra are part of his [Application of AI](https://intern.fh-wedel.de/mitarbeiter/iw/eng/lv/aki/) class. 
