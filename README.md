@@ -23,25 +23,25 @@ This is a implementation of Dijkstra and A* in pygame.
 - (Optional) Create a venv using `python -m venv .venv`
 - Install Poetry using `pip install poetry`
 - Install game using `poetry install` in the root of this repository
-- You can now use `grasim -d saves` to start using preconfigured saves
+- You can now use `poetry run grasim -d saves` to start using preconfigured saves
 
 ## Keymapping
 ### Selection screen
 | Keys          | Describtion                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------- |
 |               |                                                                                                 |
-| `<up>/<down>` | to select the graph                                                                             |
+| `<up>`/`<down>` | to select the graph                                                                             |
 | `<Enter>`     | to load the selected graph                                                                      |
 | `<Return>`    | to go back to the title screen, this is useful if you want to reload the graph selection screen |
 | `D`           | To toggle between Dijkstra and A*                                                               |
 
 ### Navigation
-| Keys                         | Describtion          |
-| ---------------------------- | -------------------- |
-| `<Return>`                   | go back              |
-| `<Enter>`                    | choose or continue   |
-| `+` / `-`                    | zoom in / out graph  |
-| `<left>/<right>/<up>/<down>` | move around in graph |
+| Keys                               | Describtion          |
+| ---------------------------------- | -------------------- |
+| `<Return>`                         | go back              |
+| `<Enter>`                          | choose or continue   |
+| `+` / `-`                          | zoom in / out graph  |
+| `<left>`/`<right>`/`<up>`/`<down>` | move around in graph |
 
 
 ## Graph language
