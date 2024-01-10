@@ -1,6 +1,21 @@
+<!-- omit in toc -->
 # Simulation of Dijkstra or A*
 This is a implementation of Dijkstra and A* in pygame.
 ![video of simulation](images/sbahn.gif)
+
+- [Installation](#installation)
+- [Keymapping](#keymapping)
+  - [Selection screen](#selection-screen)
+  - [Navigation](#navigation)
+- [Graph language](#graph-language)
+  - [Minimal Example](#minimal-example)
+  - [Syntax](#syntax)
+- [More options](#more-options)
+  - [Directed graphs](#directed-graphs)
+  - [Heuristics](#heuristics)
+  - [Subdirectories](#subdirectories)
+- [Example](#example)
+
 
 ## Installation
 - Install Python 3.11
