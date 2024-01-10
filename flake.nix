@@ -16,7 +16,7 @@
 
 	  # Issues: Missing libc and pygame wont setup display, installing via python311 works
           packages = with pkgs; [ python311 virtualenv ] ++
-            (with pkgs.python311Packages; [ pip igraph pygame pycairo matplotlib ]);
+            (with pkgs.python311Packages; [ pip igraph pygame ]);
 
 	  shellHook = "source .venv/bin/activate";
         };
