@@ -24,12 +24,26 @@ def parse_text(unparsed_text : list[str]):
     end : str | None = None 
 
     node_node_connection_regex = re.compile(r"(\w+) -(\d+)- (\w+)")
+    node_node_connection_both_regex = re.compile(r"(\w+) <-(\d+)-> (\w+)")
+    node_node_connection_left_regex = re.compile(r"(\w+) <-(\d+)- (\w+)")
+    node_node_connection_right_regex = re.compile(r"(\w+) -(\d+)-> (\w+)")
     node_heuristic_regex = re.compile(r"(\w+)\((\d+)\)")
     node_start_regex = re.compile(r"START (\w+)")
     node_end_regex = re.compile(r"END (\w+)")
 
     for line_idx, line in enumerate(unparsed_text):        
-        if match := node_node_connection_regex.match(line):
+        if match := node_node_connection_regex.match(line) or node_node_connection_both_regex.match(line):
+            node1, estimated_total, node2 = match.groups()
+            nodes.add(node1)
+            nodes.add(node2)
+            distances.append((node1, float(estimated_total), node2))
+            distances.append((node2, float(estimated_total), node1))
+        elif match := node_node_connection_left_regex.match(line):
+            node1, estimated_total, node2 = match.groups()
+            nodes.add(node1)
+            nodes.add(node2)
+            distances.append((node2, float(estimated_total), node1))
+        elif match := node_node_connection_right_regex.match(line):
             node1, estimated_total, node2 = match.groups()
             nodes.add(node1)
             nodes.add(node2)
@@ -43,7 +57,7 @@ def parse_text(unparsed_text : list[str]):
             end = str(match.group(1))
 
     # Create Graph matrix
-    graph_matrix = np.full((len(nodes), len(nodes)), -1, dtype=np.int16)
+    graph_matrix = np.full((len(nodes), len(nodes)), 0, dtype=np.int16)
     
     # Lookuptable for variables 'A' -> 0, 'B' -> 1
     node_lookup = dict(zip(list(nodes), range(len(nodes)))) 
@@ -52,7 +66,6 @@ def parse_text(unparsed_text : list[str]):
         idx1 = node_lookup[node1]
         idx2 = node_lookup[node2]
         graph_matrix[idx1, idx2] = estimated_total
-        graph_matrix[idx2, idx1] = estimated_total
 
     if start == None or end == None:
         raise SyntaxError("File did not contain 'START <NAME>' and 'END <NAME>'")
