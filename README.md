@@ -8,36 +8,62 @@ This is a implementation of Dijkstra and A* in pygame.
 - Install game using `poetry install` in the root of this repository
 - You can now use `grasim -d saves` to start using preconfigured saves
 
-# Navigation
-`<Return>` go back\
-`<Enter>` choose or continue\
-`+` / `-` zoom in / out graph\
-`<left>/<right>/<up>/<down>` move around in graph
+# Keymapping
+## Selection screen
+| Keys          | Describtion                                                                                     |
+| ------------- | ----------------------------------------------------------------------------------------------- |
+|               |                                                                                                 |
+| `<up>/<down>` | to select the graph                                                                             |
+| `<Enter>`     | to load the selected graph                                                                      |
+| `<Return>`    | to go back to the title screen, this is useful if you want to reload the graph selection screen |
+| `D`           | To toggle between Dijkstra and A*                                                               |
+
+## Navigation
+| Keys                         | Describtion          |
+| ---------------------------- | -------------------- |
+| `<Return>`                   | go back              |
+| `<Enter>`                    | choose or continue   |
+| `+` / `-`                    | zoom in / out graph  |
+| `<left>/<right>/<up>/<down>` | move around in graph |
 
 
 # Graph language
-Safefiles are loaded when they are in the local folder and end with `.graph`
+Safefiles are loaded when they are in the `saves/` (by default) folder and end with `.graph`
 
 The directory where to look for `.graph` files can be changed via the commandline:
 `grasim --diretory path-to-saves`
 
 ## Minimal Example
-if you don't specify heuristics they are considered as 0
+if you don't specify heuristics they 0
 ```
 A -1- B
 
 START A
 END B
 ```
+
 ## Syntax
 ```
-<NodeName> -<length>- NodeB
 <NodeName>(<heuristic>)
-
+<NodeName> -<length>- NodeB
 
 START <NodeName>
 END <NodeName>
+# This line is a comment
 ```
+
+## More options
+### Directed graphs
+Use `A -1-> B` for example to denote a path from A to B with a distance of 1.
+```
+<NodeName> <-<length>-> <NodeName>
+```
+### Heuristics
+Use `A(1)` for example to denote that the estimated distance from A to the target is 1. 
+The heuristic is 0 if you do not specify otherwise 
+
+### Subdirectories
+If you want to organize your graphs you can use subdirectories to group them. An example is provided.
 
 ## Example
 ![image of graph](saves/images/folien.png)
