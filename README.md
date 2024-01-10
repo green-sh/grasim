@@ -27,6 +27,7 @@ This is a implementation of Dijkstra and A* in pygame.
 
 ## Keymapping
 ### Selection screen
+
 | Keys            | Describtion                                                                                     |
 | --------------- | ----------------------------------------------------------------------------------------------- |
 |                 |                                                                                                 |
@@ -43,7 +44,6 @@ This is a implementation of Dijkstra and A* in pygame.
 | `+` / `-`                          | zoom in / out graph               |
 | `<left>`/`<right>`/`<up>`/`<down>` | move around in graph              |
 | `c`                                | to continue until best path found |
-
 
 ## Graph language
 Safefiles are loaded when they are in the `saves/` (by default) folder and end with `.graph`
