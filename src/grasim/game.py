@@ -78,7 +78,7 @@ def show_level(unparsed_save: str, game : Game):
                     traverse_idx = traverse_idx2
 
             # Draw Paths
-            for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
+            for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != 0)):
                 # if path is explored draw green otherwise white
                 if ((int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0) or ((int(djakstrar_table[idx2, 1]) == idx1) and djakstrar_table[idx2, 2] == 1.0):
                     pygame.draw.line(game.screen,"green", points_absolute_pos[idx1], points_absolute_pos[idx2], 5)
