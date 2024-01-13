@@ -25,8 +25,7 @@ def interpolate_coords(point1 : np.ndarray, point2 : np.ndarray, percent : float
 
 def show_level(unparsed_save: str, game : Game):
     """The level screen"""
-    offsetX = 0
-    offsetY = 0
+    offset = 0
     zoom = 1
 
     graph = savefile.parse_text(unparsed_save)
@@ -44,7 +43,11 @@ def show_level(unparsed_save: str, game : Game):
     points = points + abs(points.min(0))
     points = ((points / abs(points).max(0) + 0.02) * game.screen.get_size() * 0.9)
 
-    djakstrar_table = dijkstra.init_dijkstra_table(num_nodes=graph.graph_matrix.shape[0], start_idx = graph.start_idx)
+
+    cos, sin = np.cos(0.07), np.sin(0.07)
+    ROTATION_MATRIX = np.array([[cos, sin], [-sin, cos]])
+
+    dijkstra_table = dijkstra.init_dijkstra_table(num_nodes=graph.graph_matrix.shape[0], start_idx = graph.start_idx)
 
     running = True
     can_continue = False
@@ -57,30 +60,31 @@ def show_level(unparsed_save: str, game : Game):
             should_draw = False
             # drawing everything
             game.screen.fill("black")
-            points_absolute_pos = points * zoom + [offsetX, offsetY]
+            points_absolute_pos = points * zoom + offset
             # Draw nodes
             for point, name in zip(points_absolute_pos, graph.node_lookup.keys()):
                 # If node is not done draw purple, otherwise green
                 node_idx = graph.node_lookup[name]
                 if graph.end_idx == node_idx:
                     pygame.draw.circle(game.screen, "yellow", point, 5)
-                elif djakstrar_table[node_idx, 0] == np.inf:
+                elif dijkstra_table[node_idx, 0] == np.inf:
                     pygame.draw.circle(game.screen, "purple", point, 5)
-                elif djakstrar_table[node_idx, 2] != 1:
+                elif dijkstra_table[node_idx, 2] != 1:
                     pygame.draw.circle(game.screen, "orange", point, 5)
                 else:
                     pygame.draw.circle(game.screen, "green", point, 5)
                 
-                heuristic_text = "" if game.dijkstra_mode else graph.heuristics[graph.node_lookup[name]]
+                heuristic_text = "" if game.dijkstra_mode else f": {graph.heuristics[graph.node_lookup[name]]}"
+                estimated_total = "" if game.dijkstra_mode else f": {dijkstra_table[graph.node_lookup[name], 3]}"
 
-                font_screen = game.font.render(f"{name}{heuristic_text}", True, "white", "black")
+                font_screen = game.font.render(f"{name}{heuristic_text}{estimated_total}", True, "white", "black")
                 game.screen.blit(font_screen, point+5)
 
-            if djakstrar_table[graph.end_idx, 2] == 1:
+            if dijkstra_table[graph.end_idx, 2] == 1:
                 skip_until_end = False
                 traverse_idx = graph.end_idx
                 while traverse_idx != graph.start_idx:
-                    traverse_idx2 = int(djakstrar_table[traverse_idx, 1])
+                    traverse_idx2 = int(dijkstra_table[traverse_idx, 1])
                     pygame.draw.line(game.screen,"yellow", points_absolute_pos[traverse_idx], points_absolute_pos[traverse_idx2], 10)
                     traverse_idx = traverse_idx2
 
@@ -88,8 +92,8 @@ def show_level(unparsed_save: str, game : Game):
             for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != 0)):
 
                 # if path is explored draw green otherwise white
-                if ((int(djakstrar_table[idx1, 1]) == idx2) and djakstrar_table[idx1, 2] == 1.0) or \
-                    ((int(djakstrar_table[idx2, 1]) == idx1) and djakstrar_table[idx2, 2] == 1.0):
+                if ((int(dijkstra_table[idx1, 1]) == idx2) and dijkstra_table[idx1, 2] == 1.0) or \
+                    ((int(dijkstra_table[idx2, 1]) == idx1) and dijkstra_table[idx2, 2] == 1.0):
                     pygame.draw.line(game.screen,"green", points_absolute_pos[idx1], points_absolute_pos[idx2], 5)
                 else:
                     pygame.draw.line(game.screen,"white", points_absolute_pos[idx1], points_absolute_pos[idx2])
@@ -122,35 +126,35 @@ def show_level(unparsed_save: str, game : Game):
                 if event.key == pygame.K_RETURN:
                     can_continue = True
             
+        screen_size = np.array(game.screen.get_size())
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            offsetY += 20*abs(zoom)
+            offset[1] += 20*abs(zoom)
             should_draw = True
         elif keys[pygame.K_DOWN]:
-            offsetY -= 20*abs(zoom)
+            offset[1] -= 20*abs(zoom)
             should_draw = True
         if keys[pygame.K_LEFT]:
-            offsetX += 20*abs(zoom)
+            offset[0] += 20*abs(zoom)
             should_draw = True
         elif keys[pygame.K_RIGHT]:
-            offsetX -= 20*abs(zoom)
+            offset[0] -= 20*abs(zoom)
             should_draw = True
         if keys[pygame.K_PLUS]:
             zoom += 0.1
-            offsetX -= game.screen.get_size()[0]*0.1/2
-            offsetY -= game.screen.get_size()[1]*0.1/2
+            offset -= screen_size*0.1/2
             should_draw = True
         elif keys[pygame.K_MINUS]:
             zoom -= 0.1 
-            offsetX += game.screen.get_size()[0]*0.1/2
-            offsetY += game.screen.get_size()[1]*0.1/2
+            offset += screen_size*0.1/2
             should_draw = True
+        elif keys[pygame.K_r]:
+            points = np.dot(ROTATION_MATRIX, (points - screen_size/2).T).T + screen_size/2
         elif keys[pygame.K_c]:
             skip_until_end = True
-
         if can_continue or skip_until_end:
             can_continue = False
-            if dijkstra.dijkstra_step(djakstrar_table, graph, game.dijkstra_mode):
+            if dijkstra.dijkstra_step(dijkstra_table, graph, game.dijkstra_mode):
                 counter += 1
         
         pygame.display.flip()
