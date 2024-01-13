@@ -36,7 +36,11 @@ def show_level(unparsed_save: str, game : Game):
     # adjancy_matrix[adjancy_matrix != 0] = 1
 
     # Use igraph to make the graph pretty: position nodes better
-    points = np.array(ig.Graph.Adjacency(adjancy_matrix, mode="min").layout("auto").coords)
+    # Fix issue https://github.com/green-sh/grasim/issues/15 ugly graphs
+    full_graph_adjancy = adjancy_matrix + adjancy_matrix.T
+    full_graph_adjancy = np.where(full_graph_adjancy > 0, 1, 0) 
+    points = np.array(ig.Graph.Adjacency(full_graph_adjancy, mode="min").layout().coords)
+
     points = points + abs(points.min(0))
     points = ((points / abs(points).max(0) + 0.02) * game.screen.get_size() * 0.9)
 
