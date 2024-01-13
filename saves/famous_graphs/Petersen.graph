@@ -1,17 +1,17 @@
-A -1- B
-A -1- E
-A -1- F
-B -1- A
-B -1- C
-B -1- G
-C -1- B
-C -1- D
-C -1- H
-D -1- C
-D -1- E
-D -1- I
-E -1- A
-E -1- D
-E -1- J
+A -1-> B
+A -1-> E
+A -1-> F
+B -1-> A
+B -1-> C
+B -1-> G
+C -1-> B
+C -1-> D
+C -1-> H
+D -1-> C
+D -1-> E
+D -1-> I
+E -1-> A
+E -1-> D
+E -1-> J
 START A
-END F
+END E
