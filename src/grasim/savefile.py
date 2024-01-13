@@ -71,10 +71,21 @@ def parse_text(unparsed_text : list[str]):
 
     if start == None or end == None:
         raise SyntaxError("File did not contain 'START <NAME>' and 'END <NAME>'")
-
+    
     start_idx = node_lookup[start]
     end_idx = node_lookup[end]
 
+    replaced_node_lookup = {}
+    for k,v in node_lookup.items():
+        if k == start:
+            replaced_node_lookup["START " + start] = v
+        elif k == end:
+            replaced_node_lookup["END " + end] = v
+        else:
+            replaced_node_lookup[k] = v
+
+    # prefix start and end idx
+
     heuristics = [heuristics_dict.get(x, 0) for x in node_lookup.keys()]
 
-    return WaypointGraph(graph_matrix, start_idx, end_idx, node_lookup, heuristics)
+    return WaypointGraph(graph_matrix, start_idx, end_idx, replaced_node_lookup, heuristics)

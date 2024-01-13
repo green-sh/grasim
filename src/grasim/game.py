@@ -25,7 +25,7 @@ def interpolate_coords(point1 : np.ndarray, point2 : np.ndarray, percent : float
 
 def show_level(unparsed_save: str, game : Game):
     """The level screen"""
-    offset = 0
+    offset = np.array([0.0, 0.0])
     zoom = 1
 
     graph = savefile.parse_text(unparsed_save)
@@ -56,6 +56,7 @@ def show_level(unparsed_save: str, game : Game):
     should_draw = True
     counter = 0
     skip_until_end = False
+    hide_labels = False
     while running:
 
         if should_draw or skip_until_end:
@@ -79,8 +80,9 @@ def show_level(unparsed_save: str, game : Game):
                 
                 heuristic_text = "" if game.dijkstra_mode else f": {graph.heuristics[graph.node_lookup[name]]}"
                 estimated_total = "" if game.dijkstra_mode else f": {dijkstra_table[graph.node_lookup[name], 3]}"
+                draw_name = "" if hide_labels else name
 
-                font_screen = game.font.render(f"{name}{heuristic_text}{estimated_total}", True, "white", "black")
+                font_screen = game.font.render(f"{draw_name}{heuristic_text}{estimated_total}", True, "white", "black")
                 font_display.blit(font_screen, point+5)
 
             if dijkstra_table[graph.end_idx, 2] == 1:
@@ -110,7 +112,7 @@ def show_level(unparsed_save: str, game : Game):
                     font_display.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
                     font_display.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
 
-            font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, C | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
+            font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, [c]ontinue, [r]otate, [h]ide labels | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             font_display.blit(font_screen, screen_size-font_screen.get_size())
 
             counter_screen = game.font.render(f"Steps: {counter}", True, "white", "black")
@@ -120,14 +122,16 @@ def show_level(unparsed_save: str, game : Game):
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
-            should_draw = True
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
+                should_draw = True
                 if event.key == pygame.K_BACKSPACE:
                     running = False
                 if event.key == pygame.K_RETURN:
                     can_continue = True
+                if event.key == pygame.K_h:
+                    hide_labels = not hide_labels
             
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
@@ -152,8 +156,10 @@ def show_level(unparsed_save: str, game : Game):
             should_draw = True
         elif keys[pygame.K_r]:
             points = np.dot(ROTATION_MATRIX, (points - screen_size/2).T).T + screen_size/2
+            should_draw = True
         elif keys[pygame.K_c]:
             skip_until_end = True
+
         if can_continue or skip_until_end:
             can_continue = False
             if dijkstra.dijkstra_step(dijkstra_table, graph, game.dijkstra_mode):
