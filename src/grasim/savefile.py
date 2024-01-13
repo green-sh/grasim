@@ -75,9 +75,6 @@ def parse_text(unparsed_text : list[str]):
     start_idx = node_lookup[start]
     end_idx = node_lookup[end]
 
-    if len(heuristics_dict) == 0:
-        heuristics = [0] * len(node_lookup) # if no heuristics, fill with 0
-    else:
-        heuristics = [heuristics_dict[x] for x in node_lookup.keys()]
+    heuristics = [heuristics_dict.get(x, 0) for x in node_lookup.keys()]
 
     return WaypointGraph(graph_matrix, start_idx, end_idx, node_lookup, heuristics)
