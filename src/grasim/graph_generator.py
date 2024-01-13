@@ -81,5 +81,3 @@ def famous_graphs_to_files():
 
         with open(f"saves/famous_graphs/{name}.graph", "x") as f:
             f.write("\n".join(text))
-
-famous_graphs_to_files()
