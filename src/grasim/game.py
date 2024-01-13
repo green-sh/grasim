@@ -43,12 +43,14 @@ def show_level(unparsed_save: str, game : Game):
     points = points + abs(points.min(0))
     points = ((points / abs(points).max(0) + 0.02) * game.screen.get_size() * 0.9)
 
-
     cos, sin = np.cos(0.07), np.sin(0.07)
     ROTATION_MATRIX = np.array([[cos, sin], [-sin, cos]])
 
     dijkstra_table = dijkstra.init_dijkstra_table(num_nodes=graph.graph_matrix.shape[0], start_idx = graph.start_idx)
 
+    screen_size = np.array(game.screen.get_size())
+    font_display = pygame.surface.Surface(screen_size)
+    font_display.set_colorkey((255, 0, 255))
     running = True
     can_continue = False
     should_draw = True
@@ -60,6 +62,7 @@ def show_level(unparsed_save: str, game : Game):
             should_draw = False
             # drawing everything
             game.screen.fill("black")
+            font_display.fill((255, 0, 255))
             points_absolute_pos = points * zoom + offset
             # Draw nodes
             for point, name in zip(points_absolute_pos, graph.node_lookup.keys()):
@@ -78,7 +81,7 @@ def show_level(unparsed_save: str, game : Game):
                 estimated_total = "" if game.dijkstra_mode else f": {dijkstra_table[graph.node_lookup[name], 3]}"
 
                 font_screen = game.font.render(f"{name}{heuristic_text}{estimated_total}", True, "white", "black")
-                game.screen.blit(font_screen, point+5)
+                font_display.blit(font_screen, point+5)
 
             if dijkstra_table[graph.end_idx, 2] == 1:
                 skip_until_end = False
@@ -100,18 +103,18 @@ def show_level(unparsed_save: str, game : Game):
                 # check if connection is directed
                 if graph.graph_matrix[idx1, idx2] == graph.graph_matrix[idx2, idx1]:
                     font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
-                    game.screen.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
+                    font_display.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
                 else: # directed
                     font_screen_left = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
                     font_screen_right = game.font.render(f"{graph.graph_matrix[idx2, idx1]}", True, "white", "black")
-                    game.screen.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
-                    game.screen.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
+                    font_display.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
+                    font_display.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
 
             font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, C | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
-            game.screen.blit(font_screen, np.array(game.screen.get_size())-font_screen.get_size())
+            font_display.blit(font_screen, screen_size-font_screen.get_size())
 
             counter_screen = game.font.render(f"Steps: {counter}", True, "white", "black")
-            game.screen.blit(counter_screen, (game.screen.get_size()[0] - counter_screen.get_size()[0], font_screen.get_size()[1]))
+            font_display.blit(counter_screen, (screen_size[0] - counter_screen.get_size()[0], counter_screen.get_size()[1]))
             # End drawing
         
         # poll for events
@@ -126,7 +129,6 @@ def show_level(unparsed_save: str, game : Game):
                 if event.key == pygame.K_RETURN:
                     can_continue = True
             
-        screen_size = np.array(game.screen.get_size())
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
             offset[1] += 20*abs(zoom)
@@ -157,6 +159,8 @@ def show_level(unparsed_save: str, game : Game):
             if dijkstra.dijkstra_step(dijkstra_table, graph, game.dijkstra_mode):
                 counter += 1
         
+        game.screen.blit(font_display, (0, 0))
+
         pygame.display.flip()
 
         # use this to make screen video
