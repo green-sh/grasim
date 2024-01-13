@@ -65,6 +65,8 @@ def parse_text(unparsed_text : list[str]):
     for node1, estimated_total, node2 in distances:
         idx1 = node_lookup[node1]
         idx2 = node_lookup[node2]
+        if graph_matrix[idx1, idx2] != 0 and graph_matrix[idx1, idx2] != estimated_total:
+            raise ValueError(f"Ambiguous edges with different values: {node1} {node2}")
         graph_matrix[idx1, idx2] = estimated_total
 
     if start == None or end == None:
