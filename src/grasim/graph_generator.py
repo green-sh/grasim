@@ -73,11 +73,11 @@ def famous_graphs_to_files():
 
         text = []
         for i in range(pairs.shape[0]//2):
-            text.append(f"{number_to_alphabet(pairs[i][0])} -1- {number_to_alphabet(pairs[i][1])}")
+            text.append(f"{number_to_alphabet(pairs[i][0])} -1-> {number_to_alphabet(pairs[i][1])}")
 
         # Choose random start and end
         text.append(f"START {number_to_alphabet(pairs[0, 0])}")
-        text.append(f"END {number_to_alphabet(pairs[pairs.shape[0]//2, 0])}")
+        text.append(f"END {number_to_alphabet(pairs[pairs.shape[0]//2-1, 0])}")
 
-        with open(f"{name}.graph", "x") as f:
+        with open(f"saves/famous_graphs/{name}.graph", "x") as f:
             f.write("\n".join(text))

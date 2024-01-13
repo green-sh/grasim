@@ -1,0 +1,152 @@
+wedel(10)
+rissen(8)
+suelldorf(5)
+iserbrook(3)
+blankenese(0)
+hochkamp(2)
+klein_flottbeck(4)
+othmarschen(6)
+bahrenfeld(8)
+ottensen(9)
+altona(10)
+koenigstrasse(11)
+reeperbahn(13)
+landungsbruecken(15)
+stadthausbruecke(17)
+jungfernstieg(19)
+hauptbahnhof(21)
+berliner_tor(23)
+landwehr(25)
+hasselbrook(27)
+wandsbecker_chaussee(29)
+friedrichsberg(31)
+barmbek(33)
+alte_woehr(35)
+ruebenkamp(37)
+ohlsdorf(39)
+airport(42)
+kornweg(42)
+hoheneichen(44)
+wellingsbuettel(46)
+poppenbuettel(47)
+
+pinneberg(26)
+thesdorf(24)
+halstenbek(22)
+krupunder(20)
+elbgaustrasse(18)
+eidelstedt(17)
+stellingen(16)
+langenfelde(14)
+diebsteich(12)
+holstenstrasse(15)
+sternschanze(17)
+dammtor(20)
+hammerbrook(22)
+elbbruecken(24)
+veddel(26)
+wilhelmsburg(28)
+harburg(32)
+heimfeld(34)
+neuwiedenthal(37)
+neugraben(40)
+fischbek(43)
+neu_wulmsdorf(45)
+buxtehude(48)
+neukloster(52)
+horneburg(55)
+dollern(58)
+agathenburg(60)
+stade(65)
+
+berliner_tor(23)
+rothenburgsort(25)
+tiefstack(27)
+billwerder_moorfleet(30)
+mittlerer_landweg(32)
+allermoehe(34)
+nettelnburg(36)
+bergedorf(39)
+reinbek(42)
+wohltorf(44)
+aumuehle(47)
+
+#S1
+wedel -4- rissen
+rissen -4- suelldorf
+suelldorf -2- iserbrook
+iserbrook -3- blankenese
+blankenese -3- hochkamp
+hochkamp -3- klein_flottbeck
+klein_flottbeck -2- othmarschen
+othmarschen -2- bahrenfeld
+bahrenfeld -2- ottensen
+ottensen -3- altona
+altona -2- koenigstrasse
+koenigstrasse -2- reeperbahn
+reeperbahn -2- landungsbruecken
+landungsbruecken -2- stadthausbruecke
+stadthausbruecke -2- jungfernstieg
+jungfernstieg -3- hauptbahnhof
+-- hauptbahnhof -2- berliner_tor Doppelt zugewiesener Wert
+berliner_tor -3- landwehr
+landwehr -2- hasselbrook
+hasselbrook -2- wandsbecker_chaussee
+wandsbecker_chaussee -2- friedrichsberg
+friedrichsberg -2- barmbek
+barmbek -2- alte_woehr
+alte_woehr -2- ruebenkamp
+ruebenkamp -5- ohlsdorf
+ohlsdorf -4- airport
+ohlsdorf -3- kornweg
+kornweg -2- hoheneichen
+hoheneichen -2- wellingsbuettel
+wellingsbuettel -2- poppenbuettel
+
+#S3/5
+pinneberg -2- thesdorf
+thesdorf -3- halstenbek
+halstenbek -3- krupunder
+krupunder -3- elbgaustrasse
+elbgaustrasse -2- eidelstedt
+eidelstedt -1- stellingen
+stellingen -2- langenfelde
+langenfelde -2- diebsteich
+diebsteich -3- holstenstrasse
+diebsteich -3- altona
+holstenstrasse -2- sternschanze
+sternschanze -3- dammtor
+dammtor -3- hauptbahnhof
+hauptbahnhof -3- hammerbrook
+hammerbrook -2- elbbruecken
+elbbruecken -3- veddel
+veddel -3- wilhelmsburg
+wilhelmsburg -5- harburg
+harburg -2- heimfeld
+heimfeld -5- neuwiedenthal
+neuwiedenthal -5- neugraben
+neugraben -3- fischbek
+fischbek -3- neu_wulmsdorf
+neu_wulmsdorf -6- buxtehude
+buxtehude -4- neukloster
+neukloster -5- horneburg
+horneburg -4- dollern
+dollern -3- agathenburg
+agathenburg -5- stade
+
+# S2
+altona -4- holstenstrasse
+hauptbahnhof -3- berliner_tor
+berliner_tor -3- rothenburgsort
+rothenburgsort -2- tiefstack
+tiefstack -3- billwerder_moorfleet
+billwerder_moorfleet -3- mittlerer_landweg
+mittlerer_landweg -3- allermoehe
+allermoehe -2- nettelnburg
+nettelnburg -3- bergedorf
+bergedorf -4- reinbek
+reinbek -2- wohltorf
+wohltorf -4- aumuehle
+
+START hauptbahnhof
+END blankenese

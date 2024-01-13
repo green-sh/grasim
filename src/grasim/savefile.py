@@ -65,17 +65,27 @@ def parse_text(unparsed_text : list[str]):
     for node1, estimated_total, node2 in distances:
         idx1 = node_lookup[node1]
         idx2 = node_lookup[node2]
+        if graph_matrix[idx1, idx2] != 0 and graph_matrix[idx1, idx2] != estimated_total:
+            raise ValueError(f"Ambiguous edges with different values: {node1} {node2}")
         graph_matrix[idx1, idx2] = estimated_total
 
     if start == None or end == None:
         raise SyntaxError("File did not contain 'START <NAME>' and 'END <NAME>'")
-
+    
     start_idx = node_lookup[start]
     end_idx = node_lookup[end]
 
-    if len(heuristics_dict) == 0:
-        heuristics = [0] * len(node_lookup) # if no heuristics, fill with 0
-    else:
-        heuristics = [heuristics_dict[x] for x in node_lookup.keys()]
+    replaced_node_lookup = {}
+    for k,v in node_lookup.items():
+        if k == start:
+            replaced_node_lookup["START " + start] = v
+        elif k == end:
+            replaced_node_lookup["END " + end] = v
+        else:
+            replaced_node_lookup[k] = v
 
-    return WaypointGraph(graph_matrix, start_idx, end_idx, node_lookup, heuristics)
+    # prefix start and end idx
+
+    heuristics = [heuristics_dict.get(x, 0) for x in node_lookup.keys()]
+
+    return WaypointGraph(graph_matrix, start_idx, end_idx, replaced_node_lookup, heuristics)

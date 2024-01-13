@@ -1,8 +1,8 @@
-A -1- B
-A -1- C
-A -1- D
-B -1- A
-B -1- C
-B -1- D
+A -1-> B
+A -1-> C
+A -1-> D
+B -1-> A
+B -1-> C
+B -1-> D
 START A
-END C
+END B

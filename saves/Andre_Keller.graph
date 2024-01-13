@@ -1,3 +1,5 @@
+-- Examplegraph from Andre Keller. A* won't find the optimal graph
+
 A(6)
 B(4)
 C(2)
