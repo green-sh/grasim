@@ -44,6 +44,8 @@ This is a implementation of Dijkstra and A* in pygame.
 | `+` / `-`                          | zoom in / out graph               |
 | `<left>`/`<right>`/`<up>`/`<down>` | move around in graph              |
 | `c`                                | to continue until best path found |
+| `h`                                | hide labels and only show metrics |
+| `r`                                | rotate graph                      |
 
 ## Graph language
 Safefiles are loaded when they are in the `saves/` (by default) folder and end with `.graph`
