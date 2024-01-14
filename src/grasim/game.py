@@ -64,7 +64,7 @@ def show_level(unparsed_save: str, game : Game):
             # drawing everything
             game.screen.fill("black")
             font_display.fill((255, 0, 255))
-            points_absolute_pos = points * zoom + offset
+            points_absolute_pos = (points - screen_size/2) * zoom + offset * zoom + screen_size/2
             # Draw nodes
             for point, name in zip(points_absolute_pos, graph.node_lookup.keys()):
                 # If node is not done draw purple, otherwise green
@@ -135,24 +135,24 @@ def show_level(unparsed_save: str, game : Game):
             
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            offset[1] += 20*abs(zoom)
+            offset[1] += 20 / abs(zoom)
             should_draw = True
         elif keys[pygame.K_DOWN]:
-            offset[1] -= 20*abs(zoom)
+            offset[1] -= 20 / abs(zoom)
             should_draw = True
         if keys[pygame.K_LEFT]:
-            offset[0] += 20*abs(zoom)
+            offset[0] += 20 / abs(zoom)
             should_draw = True
         elif keys[pygame.K_RIGHT]:
-            offset[0] -= 20*abs(zoom)
+            offset[0] -= 20 / abs(zoom)
             should_draw = True
         if keys[pygame.K_PLUS]:
-            zoom += 0.1
-            offset -= screen_size*0.1/2
+            zoom *= 1.05
+            #offset -= screen_size*0.1/2
             should_draw = True
         elif keys[pygame.K_MINUS]:
-            zoom -= 0.1 
-            offset += screen_size*0.1/2
+            zoom /= 1.05
+            #offset += screen_size*0.1/2
             should_draw = True
         elif keys[pygame.K_r]:
             points = np.dot(ROTATION_MATRIX, (points - screen_size/2).T).T + screen_size/2
