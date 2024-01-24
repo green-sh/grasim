@@ -1,0 +1,2 @@
+class ParseError(SyntaxError):
+    pass

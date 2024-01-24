@@ -3,6 +3,7 @@ import numpy as np
 from dataclasses import dataclass
 import re
 import numpy.typing as nptype
+from grasim.errors import ParseError
 
 # list of (node1, distance, node2)
 NodeDistance = tuple[str, int, str]
@@ -15,7 +16,7 @@ class WaypointGraph:
     node_lookup : dict[str, int] # NodeName => index in graph_matrix
     heuristics : list[float] # NodeIndex => heuristic
 
-def parse_text(unparsed_text : list[str]):
+def parse_text(unparsed_text : list[str]) -> WaypointGraph:
     # TODO function: parse_graph
     nodes : set = set()
     heuristics_dict : dict[str, float] = {} # NodeName => heuristic
@@ -66,11 +67,11 @@ def parse_text(unparsed_text : list[str]):
         idx1 = node_lookup[node1]
         idx2 = node_lookup[node2]
         if graph_matrix[idx1, idx2] != 0 and graph_matrix[idx1, idx2] != estimated_total:
-            raise ValueError(f"Ambiguous edges with different values: {node1} {node2}")
+            raise ParseError(f"Ambiguous edges with different values: {node1} {node2}")
         graph_matrix[idx1, idx2] = estimated_total
 
     if start == None or end == None:
-        raise SyntaxError("File did not contain 'START <NAME>' and 'END <NAME>'")
+        raise ParseError("File did not contain 'START <NAME>' and 'END <NAME>'")
     
     start_idx = node_lookup[start]
     end_idx = node_lookup[end]

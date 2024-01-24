@@ -7,18 +7,26 @@ from grasim import savefile
 from grasim.dijkstra import dijkstra
 import os
 import pathlib
+from grasim.errors import ParseError
 
 @dataclass
 class Game:
     pygame.init()
     screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
     clock = pygame.time.Clock()
-    font = pygame.font.Font(pygame.font.get_default_font())
+    font = pygame.font.Font(pygame.font.get_default_font(), 15)
     dijkstra_mode = False
 
 def read_file(file: pathlib.Path):
     with file.open("r") as f:
         return f.readlines()
+
+def show_error(message: str, game):
+    error_font_display = game.font.render("We cannot parse this!", True, "white")
+    game.screen.blit(error_font_display, (100, 0))
+    pygame.display.flip()
+    game.clock.tick(1)
+    return
     
 def interpolate_coords(point1 : np.ndarray, point2 : np.ndarray, percent : float) -> np.ndarray:
     return (point2 - point1) * percent + point1 
@@ -28,7 +36,11 @@ def show_level(unparsed_save: str, game : Game):
     offset = np.array([0.0, 0.0])
     zoom = 1
 
-    graph = savefile.parse_text(unparsed_save)
+    try:
+        graph = savefile.parse_text(unparsed_save)
+    except ParseError:
+        show_error("This file cannot be parsed!", game)
+        return
 
     adjancy_matrix = graph.graph_matrix.copy()
     adjancy_matrix[adjancy_matrix == -1] = 0
@@ -57,6 +69,7 @@ def show_level(unparsed_save: str, game : Game):
     counter = 0
     skip_until_end = False
     hide_labels = False
+    move_mode = False
     while running:
 
         if should_draw or skip_until_end:
@@ -78,7 +91,7 @@ def show_level(unparsed_save: str, game : Game):
                 else:
                     pygame.draw.circle(game.screen, "green", point, 5)
                 
-                heuristic_text = "" if game.dijkstra_mode else f": {graph.heuristics[graph.node_lookup[name]]}"
+                heuristic_text = "" if game.dijkstra_mode else f"{graph.heuristics[graph.node_lookup[name]]}"
                 estimated_total = "" if game.dijkstra_mode else f": {dijkstra_table[graph.node_lookup[name], 3]}"
                 draw_name = "" if hide_labels else name
 
@@ -120,6 +133,8 @@ def show_level(unparsed_save: str, game : Game):
             # End drawing
         
         # poll for events
+
+
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -132,6 +147,24 @@ def show_level(unparsed_save: str, game : Game):
                     can_continue = True
                 if event.key == pygame.K_h:
                     hide_labels = not hide_labels
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_left, _, mouse_right = pygame.mouse.get_pressed(3)
+                should_draw = True
+                if mouse_left:
+                    move_mode = True
+                    pygame.mouse.get_rel() # reset relative position of mouse
+                if mouse_right:
+                    can_continue = True
+            if event.type == pygame.MOUSEWHEEL:
+                zoom *= 1 + event.y/10
+            if event.type == pygame.MOUSEBUTTONUP:
+                if mouse_left:
+                    move_mode = False
+
+        mouse_left, _, _ = pygame.mouse.get_pressed()
+        if mouse_left and move_mode:
+            offset += np.array(pygame.mouse.get_rel()) / abs(zoom)
+            should_draw = True
             
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
@@ -159,6 +192,8 @@ def show_level(unparsed_save: str, game : Game):
             should_draw = True
         elif keys[pygame.K_c]:
             skip_until_end = True
+        
+
 
         if can_continue or skip_until_end:
             can_continue = False
@@ -202,6 +237,7 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
                 if event.key == pygame.K_BACKSPACE:
                     running = False
                 if event.key == pygame.K_RETURN:
+                    # Savefile was selected in selectio screen
                     if saves[selected_save_id].is_dir():
                         savedir = saves[selected_save_id]
                         saves = [x for x in savedir.glob("*") if x.is_dir or x.suffix == ".graph"] \
@@ -215,12 +251,14 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
         game.screen.fill("black")        
         
         # Draw
+        yDrawPosition = 100 # Where to draw the level name
         for i, savename in enumerate(saves[selected_save_id:] + saves[:selected_save_id]):
             color = "black"
             if savename == saves[selected_save_id]:
                 color = "red"
-            save_screen = game.font.render(savename.name, 1, "white", color)
-            game.screen.blit(save_screen, (0, 20*i))
+            save_name_screen = game.font.render(savename.name, 1, "white", color)
+            game.screen.blit(save_name_screen, (100, yDrawPosition))
+            yDrawPosition += save_name_screen.get_size()[1]
         
         if game.dijkstra_mode: # If dijkstra is chosen
             dijkstramode_text = "Current mode is: Dijkstra   Press D to switch to A*"
