@@ -28,7 +28,11 @@ def show_level(unparsed_save: str, game : Game):
     offset = np.array([0.0, 0.0])
     zoom = 1
 
-    graph = savefile.parse_text(unparsed_save)
+    try:
+        graph = savefile.parse_text(unparsed_save)
+    except ParseError:
+        show_error("This file cannot be parsed!", game)
+        return
 
     adjancy_matrix = graph.graph_matrix.copy()
     adjancy_matrix[adjancy_matrix == -1] = 0
@@ -202,6 +206,7 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
                 if event.key == pygame.K_BACKSPACE:
                     running = False
                 if event.key == pygame.K_RETURN:
+                    # Savefile was selected in selectio screen
                     if saves[selected_save_id].is_dir():
                         savedir = saves[selected_save_id]
                         saves = [x for x in savedir.glob("*") if x.is_dir or x.suffix == ".graph"] \
