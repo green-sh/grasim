@@ -21,9 +21,11 @@ This is a implementation of Dijkstra and A* in pygame.
 ## Installation
 - Install Python 3.11
 - (Optional) Create a venv using `python -m venv .venv`
-- Install Poetry using `pip install poetry`
-- Install game using `poetry install` in the root of this repository
-- You can now use `poetry run grasim -d saves` to start using preconfigured saves
+- (Recommended) Clone the repository (you will at least need some saves)
+- install using `pip3 install git+https://github.com/green-sh/grasim`
+- Run using `grasim -d saves/`
+
+Alternatively you can install it using poetry `poetry install` and then run with `poetry run grasim`
 
 ## Keymapping
 ### Selection screen
@@ -124,4 +126,4 @@ END Z
 
 ## References
 - This project uses [python-igraph](https://github.com/igraph/python-igraph) to layout the graphs
-- Thanks to [Sebastion Iwanowski](https://www.fh-wedel.de/wir/organisation/team/detail/profil/profile/show/Sebastian-Iwanowski/) for feedback and support. A* and Dijkstra are part of his [Application of AI](https://intern.fh-wedel.de/mitarbeiter/iw/eng/lv/aki/) class. 
+- Thanks to [Prof. Dr. Sebastion Iwanowski](https://www.fh-wedel.de/wir/organisation/team/detail/profil/profile/show/Sebastian-Iwanowski/) for feedback and support. A* and Dijkstra are part of his [Application of AI](https://intern.fh-wedel.de/mitarbeiter/iw/eng/lv/aki/) class. 
