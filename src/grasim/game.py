@@ -59,6 +59,7 @@ def show_level(unparsed_save: str, game : Game):
     ROTATION_MATRIX = np.array([[cos, sin], [-sin, cos]])
 
     dijkstra_table = dijkstra.init_dijkstra_table(num_nodes=graph.graph_matrix.shape[0], start_idx = graph.start_idx)
+    dijkstra.dijkstra_step(dijkstra_table, graph, game.dijkstra_mode)
 
     screen_size = np.array(game.screen.get_size())
     font_display = pygame.surface.Surface(screen_size)
