@@ -29,7 +29,7 @@ def dijkstra_step(dijkstra_table, graph : WaypointGraph, dijkstra_mode : bool) -
 
         dijkstra_table[next_idx][2] = 1
 
-        for idx_expand in np.where(graph.graph_matrix[next_idx] != 0)[0]:
+        for idx_expand in np.where(graph.graph_matrix[next_idx] != -1)[0]:
             distance = graph.graph_matrix[next_idx, idx_expand] + dijkstra_table[next_idx, 0]
             estimated_total = distance + (0 if dijkstra_mode else graph.heuristics[idx_expand])
             # if is not done and distance is smaller than already there

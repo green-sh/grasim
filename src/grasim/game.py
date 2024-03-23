@@ -43,13 +43,13 @@ def show_level(unparsed_save: str, game : Game):
         return
 
     adjancy_matrix = graph.graph_matrix.copy()
-    adjancy_matrix[adjancy_matrix == -1] = 0 # TODO: https://github.com/green-sh/grasim/issues/20
+    # adjancy_matrix[adjancy_matrix == -1] = 0 # TODO: https://github.com/green-sh/grasim/issues/20
     # adjancy_matrix[adjancy_matrix != 0] = 1
 
     # Use igraph to make the graph pretty: position nodes better
     # Fix issue https://github.com/green-sh/grasim/issues/15 ugly graphs
     full_graph_adjancy = adjancy_matrix + adjancy_matrix.T
-    full_graph_adjancy = np.where(full_graph_adjancy > 0, 1, 0) 
+    full_graph_adjancy = np.where(full_graph_adjancy > -1, 1, 0) 
     points = np.array(ig.Graph.Adjacency(full_graph_adjancy, mode="min").layout().coords)
 
     points = points + abs(points.min(0))
@@ -63,9 +63,9 @@ def show_level(unparsed_save: str, game : Game):
     screen_size = np.array(game.screen.get_size())
     font_display = pygame.surface.Surface(screen_size)
     font_display.set_colorkey((255, 0, 255))
-    running = True
-    can_continue = False
-    should_draw = True
+    running = True # This can stop the game
+    can_continue = False # c key continues until target reached
+    should_draw = True # Only draw if something changed
     counter = 0
     skip_until_end = False
     hide_labels = False
@@ -108,7 +108,7 @@ def show_level(unparsed_save: str, game : Game):
                     traverse_idx = traverse_idx2
 
             # Draw Paths
-            for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != 0)):
+            for idx1, idx2 in np.column_stack(np.where(graph.graph_matrix != -1)):
 
                 # if path is explored draw green otherwise white
                 if ((int(dijkstra_table[idx1, 1]) == idx2) and dijkstra_table[idx1, 2] == 1.0) or \
@@ -121,10 +121,14 @@ def show_level(unparsed_save: str, game : Game):
                     font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]:.1f}", True, "white", "black")
                     font_display.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
                 else: # directed
-                    font_screen_left = game.font.render(f"{graph.graph_matrix[idx1, idx2]:.1f}", True, "white", "black")
-                    font_screen_right = game.font.render(f"{graph.graph_matrix[idx2, idx1]:.1f}", True, "white", "black")
-                    font_display.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
-                    font_display.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
+                    distance1 = graph.graph_matrix[idx1, idx2]
+                    distance2 = graph.graph_matrix[idx2, idx1]
+                    if distance1 != -1:
+                        font_screen_left = game.font.render(f"{distance1:.1f}", True, "white", "black")
+                        font_display.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
+                    if distance2 != -1:
+                        font_screen_right = game.font.render(f"{distance2:.1f}", True, "white", "black")
+                        font_display.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
 
             font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, [c]ontinue, [r]otate, [h]ide labels | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
             font_display.blit(font_screen, screen_size-font_screen.get_size())
@@ -134,8 +138,6 @@ def show_level(unparsed_save: str, game : Game):
             # End drawing
         
         # poll for events
-
-
         # pygame.QUIT event means the user clicked X to close your window
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -194,8 +196,6 @@ def show_level(unparsed_save: str, game : Game):
         elif keys[pygame.K_c]:
             skip_until_end = True
         
-
-
         if can_continue or skip_until_end:
             can_continue = False
             if dijkstra.dijkstra_step(dijkstra_table, graph, game.dijkstra_mode):

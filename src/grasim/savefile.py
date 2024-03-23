@@ -57,8 +57,8 @@ def parse_text(unparsed_text : list[str]) -> WaypointGraph:
         elif match := node_end_regex.match(line):
             end = str(match.group(1))
 
-    # Create Graph matrix
-    graph_matrix = np.full((len(nodes), len(nodes)), 0, dtype=np.float64)
+    # Create Graph matrix with -1 as not connected
+    graph_matrix = np.full((len(nodes), len(nodes)), -1, dtype=np.float64)
     
     # Lookuptable for variables 'A' -> 0, 'B' -> 1
     node_lookup = dict(zip(list(nodes), range(len(nodes)))) 
@@ -66,7 +66,7 @@ def parse_text(unparsed_text : list[str]) -> WaypointGraph:
     for node1, estimated_total, node2 in distances:
         idx1 = node_lookup[node1]
         idx2 = node_lookup[node2]
-        if graph_matrix[idx1, idx2] != 0 and graph_matrix[idx1, idx2] != estimated_total:
+        if graph_matrix[idx1, idx2] != -1 and graph_matrix[idx1, idx2] != estimated_total:
             raise ParseError(f"Ambiguous edges with different values: {node1} {node2}")
         graph_matrix[idx1, idx2] = estimated_total
 
