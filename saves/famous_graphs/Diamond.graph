@@ -1,7 +1,0 @@
-A -1-> B
-A -1-> C
-B -1-> A
-B -1-> C
-B -1-> D
-START A
-END B
