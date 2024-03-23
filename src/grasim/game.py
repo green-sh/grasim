@@ -38,8 +38,8 @@ def show_level(unparsed_save: str, game : Game):
 
     try:
         graph = savefile.parse_text(unparsed_save)
-    except ParseError:
-        show_error("This file cannot be parsed!", game)
+    except ParseError as parse:
+        show_error("This file cannot be parsed! " + parse.msg, game)
         return
 
     adjancy_matrix = graph.graph_matrix.copy()
