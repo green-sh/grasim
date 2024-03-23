@@ -19,16 +19,16 @@ class WaypointGraph:
 def parse_text(unparsed_text : list[str]) -> WaypointGraph:
     # TODO function: parse_graph
     nodes : set = set()
-    heuristics_dict : dict[str, float] = {} # NodeName => heuristic
+    heuristics_dict : dict[str, int] = {} # NodeName => heuristic
     distances : list[NodeDistance] = []
     start : str | None = None
     end : str | None = None 
 
-    node_node_connection_regex = re.compile(r"(\w+) -(\d+)- (\w+)")
-    node_node_connection_both_regex = re.compile(r"(\w+) <-(\d+)-> (\w+)")
-    node_node_connection_left_regex = re.compile(r"(\w+) <-(\d+)- (\w+)")
-    node_node_connection_right_regex = re.compile(r"(\w+) -(\d+)-> (\w+)")
-    node_heuristic_regex = re.compile(r"(\w+)\((\d+)\)")
+    node_node_connection_regex = re.compile(r"(\w+) -([0-9.]+)- (\w+)")
+    node_node_connection_both_regex = re.compile(r"(\w+) <-([0-9.]+)-> (\w+)")
+    node_node_connection_left_regex = re.compile(r"(\w+) <-([0-9.]+)- (\w+)")
+    node_node_connection_right_regex = re.compile(r"(\w+) -([0-9.]+)-> (\w+)")
+    node_heuristic_regex = re.compile(r"(\w+)\(([0-9.]+)\)")
     node_start_regex = re.compile(r"START (\w+)")
     node_end_regex = re.compile(r"END (\w+)")
 
@@ -58,7 +58,7 @@ def parse_text(unparsed_text : list[str]) -> WaypointGraph:
             end = str(match.group(1))
 
     # Create Graph matrix
-    graph_matrix = np.full((len(nodes), len(nodes)), 0, dtype=np.int16)
+    graph_matrix = np.full((len(nodes), len(nodes)), 0, dtype=np.float64)
     
     # Lookuptable for variables 'A' -> 0, 'B' -> 1
     node_lookup = dict(zip(list(nodes), range(len(nodes)))) 

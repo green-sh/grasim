@@ -74,7 +74,7 @@ def show_level(unparsed_save: str, game : Game):
 
         if should_draw or skip_until_end:
             should_draw = False
-            # drawing everything
+            # drawing Nodes
             game.screen.fill("black")
             font_display.fill((255, 0, 255))
             points_absolute_pos = (points - screen_size/2) * zoom + offset * zoom + screen_size/2
@@ -91,13 +91,14 @@ def show_level(unparsed_save: str, game : Game):
                 else:
                     pygame.draw.circle(game.screen, "green", point, 5)
                 
-                heuristic_text = "" if game.dijkstra_mode else f"{graph.heuristics[graph.node_lookup[name]]}"
-                estimated_total = "" if game.dijkstra_mode else f": {dijkstra_table[graph.node_lookup[name], 3]}"
+                heuristic_text = "" if game.dijkstra_mode else f":{graph.heuristics[graph.node_lookup[name]]:.1f}"
+                estimated_total = "" if game.dijkstra_mode else f": {dijkstra_table[graph.node_lookup[name], 3]:.1f}"
                 draw_name = "" if hide_labels else name
 
                 font_screen = game.font.render(f"{draw_name}{heuristic_text}{estimated_total}", True, "white", "black")
                 font_display.blit(font_screen, point+5)
 
+            # Draw final path
             if dijkstra_table[graph.end_idx, 2] == 1:
                 skip_until_end = False
                 traverse_idx = graph.end_idx
@@ -117,11 +118,11 @@ def show_level(unparsed_save: str, game : Game):
                     pygame.draw.line(game.screen,"white", points_absolute_pos[idx1], points_absolute_pos[idx2])
                 # check if connection is directed
                 if graph.graph_matrix[idx1, idx2] == graph.graph_matrix[idx2, idx1]:
-                    font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
+                    font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]:.1f}", True, "white", "black")
                     font_display.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
                 else: # directed
-                    font_screen_left = game.font.render(f"{graph.graph_matrix[idx1, idx2]}", True, "white", "black")
-                    font_screen_right = game.font.render(f"{graph.graph_matrix[idx2, idx1]}", True, "white", "black")
+                    font_screen_left = game.font.render(f"{graph.graph_matrix[idx1, idx2]:.1f}", True, "white", "black")
+                    font_screen_right = game.font.render(f"{graph.graph_matrix[idx2, idx1]:.1f}", True, "white", "black")
                     font_display.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
                     font_display.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
 

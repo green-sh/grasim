@@ -87,6 +87,9 @@ The heuristic is 0 if you do not specify otherwise
 ### Subdirectories
 If you want to organize your graphs you can use subdirectories to group them. An example is provided.
 
+### Other
+- Decimal numbers are supported but will be rounded to the nearest decimal point when rendered.
+
 ## Example
 Code for graph below
 ```
