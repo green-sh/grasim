@@ -43,7 +43,7 @@ def show_level(unparsed_save: str, game : Game):
         return
 
     adjancy_matrix = graph.graph_matrix.copy()
-    adjancy_matrix[adjancy_matrix == -1] = 0
+    adjancy_matrix[adjancy_matrix == -1] = 0 # TODO: https://github.com/green-sh/grasim/issues/20
     # adjancy_matrix[adjancy_matrix != 0] = 1
 
     # Use igraph to make the graph pretty: position nodes better
@@ -92,7 +92,7 @@ def show_level(unparsed_save: str, game : Game):
                     pygame.draw.circle(game.screen, "green", point, 5)
                 
                 heuristic_text = "" if game.dijkstra_mode else f":{graph.heuristics[graph.node_lookup[name]]:.1f}"
-                estimated_total = "" if game.dijkstra_mode else f": {dijkstra_table[graph.node_lookup[name], 3]:.1f}"
+                estimated_total = f": {dijkstra_table[graph.node_lookup[name], 3]:.1f}"
                 draw_name = "" if hide_labels else name
 
                 font_screen = game.font.render(f"{draw_name}{heuristic_text}{estimated_total}", True, "white", "black")
