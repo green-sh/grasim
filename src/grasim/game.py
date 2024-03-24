@@ -103,8 +103,8 @@ def show_level(unparsed_save: str, game : Game):
                 total_screen = game.font.render(f"{estimated_total}", False, config.NODE_ESTIMATED_TOTAL_COLOR)
                 font_size = font_screen.get_size()
                 font_display.blit(font_screen, point - [font_size[0]/2, font_size[1]+10])
-                font_display.blit(heur_screen, point - [font_size[0]/2, font_size[1]*2+10])
-                font_display.blit(total_screen, point - [font_size[0]/2, font_size[1]*3+10])
+                font_display.blit(heur_screen, point - [font_size[0]/2, font_size[1]*3+10])
+                font_display.blit(total_screen, point - [font_size[0]/2, font_size[1]*2+10])
 
             # Draw final path
             if dijkstra_table[graph.end_idx, 2] == 1:
@@ -271,7 +271,7 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
             dijkstramode_text = "Current mode is: Dijkstra   Press D to switch to A*"
         else:
             dijkstramode_text = "Current mode is: A*         Press D to switch to Dijkstra"
-        dijkstramode_font = game.font.render(dijkstramode_text, False, "white")
+        dijkstramode_font = game.font.render(dijkstramode_text, False, config.LEGEND_TEXT)
         game.screen.blit(dijkstramode_font, (game.screen.get_size()[0]-dijkstramode_font.get_size()[0], game.screen.get_size()[1]-20))
 
         pygame.display.flip()
