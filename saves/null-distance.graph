@@ -1,0 +1,7 @@
+-- Examplegraph 
+A -0-> B
+A -10- C
+B -15- D
+
+START A 
+END D

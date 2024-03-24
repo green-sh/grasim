@@ -8,13 +8,15 @@ from grasim.dijkstra import dijkstra
 import os
 import pathlib
 from grasim.errors import ParseError
+import grasim.config as config
 
 @dataclass
 class Game:
+    """The game class that holds all the game state"""
     pygame.init()
     screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
     clock = pygame.time.Clock()
-    font = pygame.font.Font(pygame.font.get_default_font(), 15)
+    font = pygame.font.Font(pygame.font.get_default_font(), config.FONT_SIZE)
     dijkstra_mode = False
 
 def read_file(file: pathlib.Path):
@@ -76,7 +78,7 @@ def show_level(unparsed_save: str, game : Game):
         if should_draw or skip_until_end:
             should_draw = False
             # drawing Nodes
-            game.screen.fill("black")
+            game.screen.fill(config.BACKGROUND_COLOR)
             font_display.fill((255, 0, 255))
             points_absolute_pos = (points - screen_size/2) * zoom + offset * zoom + screen_size/2
             # Draw nodes
@@ -84,20 +86,25 @@ def show_level(unparsed_save: str, game : Game):
                 # If node is not done draw purple, otherwise green
                 node_idx = graph.node_lookup[name]
                 if graph.end_idx == node_idx:
-                    pygame.draw.circle(game.screen, "yellow", point, 5)
+                    pygame.draw.circle(game.screen, config.NODE_END_COLOR, point, 5)
                 elif dijkstra_table[node_idx, 0] == np.inf:
-                    pygame.draw.circle(game.screen, "purple", point, 5)
+                    pygame.draw.circle(game.screen, config.NODE_UNIDSCOVERED_COLOR, point, 5)
                 elif dijkstra_table[node_idx, 2] != 1:
-                    pygame.draw.circle(game.screen, "orange", point, 5)
+                    pygame.draw.circle(game.screen, config.NODE_DISCOVERED_COLOR, point, 5)
                 else:
-                    pygame.draw.circle(game.screen, "green", point, 5)
+                    pygame.draw.circle(game.screen, config.NODE_DONE_COLOR, point, 5)
                 
-                heuristic_text = "" if game.dijkstra_mode else f":{graph.heuristics[graph.node_lookup[name]]:.1f}"
-                estimated_total = f": {dijkstra_table[graph.node_lookup[name], 3]:.1f}"
+                heuristic_text = "" if game.dijkstra_mode else f"{graph.heuristics[graph.node_lookup[name]]:.0f}"
+                estimated_total = f"{dijkstra_table[graph.node_lookup[name], 3]:.0f}"
                 draw_name = "" if hide_labels else name
 
-                font_screen = game.font.render(f"{draw_name}{heuristic_text}{estimated_total}", True, "white", "black")
-                font_display.blit(font_screen, point+5)
+                font_screen = game.font.render(f"{draw_name}", False, config.NODE_NAME_COLOR, config.NODE_NAME_BACKGROUND)
+                heur_screen = game.font.render(f"{heuristic_text}", False, config.NODE_HEURISTIC_COLOR)
+                total_screen = game.font.render(f"{estimated_total}", False, config.NODE_ESTIMATED_TOTAL_COLOR)
+                font_size = font_screen.get_size()
+                font_display.blit(font_screen, point - [font_size[0]/2, font_size[1]+10])
+                font_display.blit(heur_screen, point - [font_size[0]/2, font_size[1]*2+10])
+                font_display.blit(total_screen, point - [font_size[0]/2, font_size[1]*3+10])
 
             # Draw final path
             if dijkstra_table[graph.end_idx, 2] == 1:
@@ -105,7 +112,7 @@ def show_level(unparsed_save: str, game : Game):
                 traverse_idx = graph.end_idx
                 while traverse_idx != graph.start_idx:
                     traverse_idx2 = int(dijkstra_table[traverse_idx, 1])
-                    pygame.draw.line(game.screen,"yellow", points_absolute_pos[traverse_idx], points_absolute_pos[traverse_idx2], 10)
+                    pygame.draw.line(game.screen,config.PATH_FINAL_COLOR , points_absolute_pos[traverse_idx], points_absolute_pos[traverse_idx2], 10)
                     traverse_idx = traverse_idx2
 
             # Draw Paths
@@ -114,24 +121,24 @@ def show_level(unparsed_save: str, game : Game):
                 # if path is explored draw green otherwise white
                 if ((int(dijkstra_table[idx1, 1]) == idx2) and dijkstra_table[idx1, 2] == 1.0) or \
                     ((int(dijkstra_table[idx2, 1]) == idx1) and dijkstra_table[idx2, 2] == 1.0):
-                    pygame.draw.line(game.screen,"green", points_absolute_pos[idx1], points_absolute_pos[idx2], 5)
+                    pygame.draw.line(game.screen,config.PATH_DONE, points_absolute_pos[idx1], points_absolute_pos[idx2], 5)
                 else:
-                    pygame.draw.line(game.screen,"white", points_absolute_pos[idx1], points_absolute_pos[idx2])
+                    pygame.draw.line(game.screen,config.PATH_OPEN, points_absolute_pos[idx1], points_absolute_pos[idx2])
                 # check if connection is directed
                 if graph.graph_matrix[idx1, idx2] == graph.graph_matrix[idx2, idx1]:
-                    font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]:.1f}", True, "white", "black")
+                    font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]:.0f}", True, config.PATH_TEXT_COLOR)
                     font_display.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
                 else: # directed
                     distance1 = graph.graph_matrix[idx1, idx2]
                     distance2 = graph.graph_matrix[idx2, idx1]
                     if distance1 != -1:
-                        font_screen_left = game.font.render(f"{distance1:.1f}", True, "white", "black")
+                        font_screen_left = game.font.render(f"{distance1:.0f}", True, config.PATH_TEXT_COLOR)
                         font_display.blit(font_screen_left, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.8))
                     if distance2 != -1:
-                        font_screen_right = game.font.render(f"{distance2:.1f}", True, "white", "black")
+                        font_screen_right = game.font.render(f"{distance2:.0f}", True, config.PATH_TEXT_COLOR)
                         font_display.blit(font_screen_right, interpolate_coords(points_absolute_pos[idx1], points_absolute_pos[idx2], 0.2))
 
-            font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, [c]ontinue, [r]otate, [h]ide labels | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, "white", "black")
+            font_screen = game.font.render("Inputs: Step: <ENTER>, <BACK>, [c]ontinue, [r]otate, [h]ide labels | Navigate: +, -, <UP>, <DOWN>, <LEFT>, <RIGHT>", True, config.LEGEND_TEXT, config.LEGEND_BACKGROUND)
             font_display.blit(font_screen, screen_size-font_screen.get_size())
 
             counter_screen = game.font.render(f"Steps: {counter}", True, "white", "black")
@@ -216,11 +223,9 @@ def show_level(unparsed_save: str, game : Game):
 def select_level_screen(game: Game, savedir : pathlib.Path):
 
     saves = [x for x in savedir.glob("*") if x.is_dir or x.suffix == ".graph"]
-    # saves = sorted(saves, key=lambda x: str.lower(x.name))
 
     if len(saves) == 0:
         saves.append(f"Couldn't find any saves in dir \"{savedir.name}\". You can start the programm with the -d <Directory> flag")
-    # saves.append("random")
 
     selected_save_id = 0
     running = True
@@ -250,15 +255,15 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
 
                 selected_save_id = selected_save_id % len(saves)
 
-        game.screen.fill("black")        
+        game.screen.fill(config.LEVEL_SELECTION_BACKGROUND)        
         
         # Draw
         yDrawPosition = 100 # Where to draw the level name
         for i, savename in enumerate(saves[selected_save_id:] + saves[:selected_save_id]):
-            color = "black"
+            color = config.LEVEL_SELECTION_TEXT_BACK
             if savename == saves[selected_save_id]:
-                color = "red"
-            save_name_screen = game.font.render(savename.name, 1, "white", color)
+                color = config.LEVEL_SELECTION_TEXT_BACK_HOVER
+            save_name_screen = game.font.render(savename.name, False, config.LEVEL_SELECTION_TEXT, color)
             game.screen.blit(save_name_screen, (100, yDrawPosition))
             yDrawPosition += save_name_screen.get_size()[1]
         
@@ -266,7 +271,7 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
             dijkstramode_text = "Current mode is: Dijkstra   Press D to switch to A*"
         else:
             dijkstramode_text = "Current mode is: A*         Press D to switch to Dijkstra"
-        dijkstramode_font = game.font.render(dijkstramode_text, 1, "white", "black")
+        dijkstramode_font = game.font.render(dijkstramode_text, False, "white")
         game.screen.blit(dijkstramode_font, (game.screen.get_size()[0]-dijkstramode_font.get_size()[0], game.screen.get_size()[1]-20))
 
         pygame.display.flip()

@@ -1,4 +1,4 @@
--- Examplegraph from Andre Keller. A* won't find the optimal graph
+-- Examplegraph from Andre Keller (see class slides). A* won't find the optimal graph
 
 A(6)
 B(4)
