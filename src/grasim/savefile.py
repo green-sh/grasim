@@ -29,6 +29,7 @@ def parse_text(unparsed_text : list[str]) -> WaypointGraph:
     node_node_connection_left_regex = re.compile(r"(\w+) <-([0-9.]+)- (\w+)")
     node_node_connection_right_regex = re.compile(r"(\w+) -([0-9.]+)-> (\w+)")
     node_heuristic_regex = re.compile(r"(\w+)\(([0-9.]+)\)")
+    node_wihout_heuristic_regex = re.compile(r"(\w+)")
     node_start_regex = re.compile(r"START (\w+)")
     node_end_regex = re.compile(r"END (\w+)")
 
@@ -56,6 +57,9 @@ def parse_text(unparsed_text : list[str]) -> WaypointGraph:
             start = str(match.group(1))
         elif match := node_end_regex.match(line):
             end = str(match.group(1))
+        elif match := node_wihout_heuristic_regex.match(line):
+            node = str(match.group(1))
+            nodes.add(node)
 
     # Create Graph matrix with -1 as not connected
     graph_matrix = np.full((len(nodes), len(nodes)), -1, dtype=np.float64)
@@ -73,8 +77,12 @@ def parse_text(unparsed_text : list[str]) -> WaypointGraph:
     if start == None or end == None:
         raise ParseError("File did not contain 'START <NAME>' and 'END <NAME>'")
     
-    start_idx = node_lookup[start]
-    end_idx = node_lookup[end]
+    
+    start_idx = node_lookup.get(start)
+    end_idx = node_lookup.get(end)
+    
+    if start_idx == None or end_idx == None:
+        raise ParseError(f"Path Start or End was invalid and couldn't be found!")
 
     replaced_node_lookup = {}
     for k,v in node_lookup.items():

@@ -1,0 +1,10 @@
+A 
+B 
+C 
+
+A -1- B 
+B -1- C 
+A -1- C
+
+START A
+END C

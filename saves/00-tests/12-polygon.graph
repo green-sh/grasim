@@ -1,0 +1,14 @@
+A
+B
+C 
+D 
+E
+
+A -1-> B
+B -1-> C 
+C -1-> D 
+D -1-> E 
+E -1-> A
+
+START A
+END E

@@ -89,6 +89,9 @@ If you want to organize your graphs you can use subdirectories to group them. An
 
 ### Other
 - Decimal numbers are supported but will be rounded to the nearest non decimal number when rendered.
+- you can edit the src/config.py to set different styles or settings. 
+  - NODE_TEXT_OFFSET: If the labels are slightly off and not centered this is why. This is intentional to avoid overlapping
+  - FONT_SIZE: Set fontsize
 
 ## Example
 Code for graph below

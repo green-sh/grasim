@@ -2,6 +2,7 @@ from grasim.graph_generator import create_random_graph
 import pygame
 import numpy as np
 import igraph as ig
+import traceback
 from dataclasses import dataclass
 from grasim import savefile
 from grasim.dijkstra import dijkstra
@@ -24,7 +25,7 @@ def read_file(file: pathlib.Path):
         return f.readlines()
 
 def show_error(message: str, game):
-    error_font_display = game.font.render("We cannot parse this!", True, "white")
+    error_font_display = game.font.render("We cannot parse this! " + message, True, config.ERROR_TEXT_COLOR)
     game.screen.blit(error_font_display, (100, 0))
     pygame.display.flip()
     game.clock.tick(1)
@@ -43,6 +44,10 @@ def show_level(unparsed_save: str, game : Game):
     except ParseError as parse:
         show_error("This file cannot be parsed! " + parse.msg, game)
         return
+    except Exception as e:
+        traceback.print_exc()
+        show_error("This file cannot be parsed! Uncaptured error: " + str(e), game)
+        return
 
     adjancy_matrix = graph.graph_matrix.copy()
     # adjancy_matrix[adjancy_matrix == -1] = 0 # TODO: https://github.com/green-sh/grasim/issues/20
@@ -52,10 +57,14 @@ def show_level(unparsed_save: str, game : Game):
     # Fix issue https://github.com/green-sh/grasim/issues/15 ugly graphs
     full_graph_adjancy = adjancy_matrix + adjancy_matrix.T
     full_graph_adjancy = np.where(full_graph_adjancy > -1, 1, 0) 
-    points = np.array(ig.Graph.Adjacency(full_graph_adjancy, mode="min").layout().coords)
+
+    layout = "auto"
+    if len(graph.node_lookup) < 5:
+        layout = "circle"
+    points = np.array(ig.Graph.Adjacency(full_graph_adjancy, mode="directed").layout(layout).coords)
 
     points = points + abs(points.min(0))
-    points = ((points / abs(points).max(0) + 0.02) * game.screen.get_size() * 0.9)
+    points = ((points / (abs(points).max(0) + 0.02)) * game.screen.get_size() * 0.9)
 
     cos, sin = np.cos(0.07), np.sin(0.07)
     ROTATION_MATRIX = np.array([[cos, sin], [-sin, cos]])
@@ -125,10 +134,13 @@ def show_level(unparsed_save: str, game : Game):
                 else:
                     pygame.draw.line(game.screen,config.PATH_OPEN, points_absolute_pos[idx1], points_absolute_pos[idx2])
                 # check if connection is directed
-                if graph.graph_matrix[idx1, idx2] == graph.graph_matrix[idx2, idx1]:
+                if graph.graph_matrix[idx1, idx2] == graph.graph_matrix[idx2, idx1] and idx1 < idx2:
                     font_screen = game.font.render(f"{graph.graph_matrix[idx1, idx2]:.0f}", True, config.PATH_TEXT_COLOR)
-                    font_display.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2-5)
-                else: # directed
+                    direction = (points_absolute_pos[idx1] - points_absolute_pos[idx2])
+                    distance = np.linalg.norm(direction)
+                    moveAsideOffset = direction / distance
+                    font_display.blit(font_screen, (points_absolute_pos[idx1] + points_absolute_pos[idx2])/2 + (moveAsideOffset * distance * config.NODE_TEXT_OFFSET))
+                elif idx1 < idx2: # directed
                     distance1 = graph.graph_matrix[idx1, idx2]
                     distance2 = graph.graph_matrix[idx2, idx1]
                     if distance1 != -1:

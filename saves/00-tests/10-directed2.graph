@@ -1,0 +1,14 @@
+# This constallation shows an overlapping graph idk y
+
+A
+B
+C
+
+A -0-> B
+B -1-> A 
+
+A -10-> C
+B -0-> C
+
+START A
+END C
