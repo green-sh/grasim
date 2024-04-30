@@ -1,0 +1,8 @@
+A
+B
+
+A -1-> A 
+A -1-> B
+
+START A
+END B

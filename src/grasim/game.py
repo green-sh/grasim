@@ -239,6 +239,7 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
     if len(saves) == 0:
         saves.append(f"Couldn't find any saves in dir \"{savedir.name}\". You can start the programm with the -d <Directory> flag")
 
+    saves.sort(key=lambda x: x.name)
     selected_save_id = 0
     running = True
     while running:
@@ -261,6 +262,7 @@ def select_level_screen(game: Game, savedir : pathlib.Path):
                         savedir = saves[selected_save_id]
                         saves = [x for x in savedir.glob("*") if x.is_dir or x.suffix == ".graph"] \
                                 + [ savedir.joinpath("..") ]
+                        saves.sort(key=lambda x: x.name)
                     else:
                         graphtext = read_file(saves[selected_save_id])
                         show_level(graphtext, game)
