@@ -1,5 +1,5 @@
 @echo off
-python -m venv .venv
-python -m pip install poetry
+REM python -m venv .venv
+REM python -m pip install poetry
 poetry install
 pause
